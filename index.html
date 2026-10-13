@@ -1,5 +1,1247 @@
+<!-- Chosen Palette: Warm Neutrals & Sunset Harmony -->
+<!-- Application Structure Plan: Single-page interactive web application for Chimei Hospital Weight Control Weekly Plan. The layout features a header with top copyright notice, patient profile management with dietitian switch mode (password: chimei888), week tabs navigation (Baseline + Weeks 1-8), morning metrics measurement section with previous week baseline reference badges, dynamic Chart.js trend graph, 11-goal weekly checklist with score evaluation, right sidebar with score progress bar and habit-to-body metric causal feedback analysis, 8-week cross-reference overview table, compact red-dot goal achievement matrix designed for mobile no-scroll viewing, and integrated Google Apps Script Web App API synchronization with CSV report exports. -->
+<!-- Visualization & Content Choices: Chart.js Canvas line graph for tracking morning weight, fat mass, and muscle mass over time; CSS grid/flexbox layouts with Tailwind glassmorphism styling; pure HTML/CSS dot-matrix display for goal achievement ratios; Vanilla JS for local storage database management, instant name-matching historical auto-fill, and cloud spreadsheet submission. CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 <!DOCTYPE html>
-/**
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奇美醫院營養門診 - 體重控制周計畫</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        html {
+            font-size: 18px;
+        }
+        @media (min-width: 640px) {
+            html {
+                font-size: 19px;
+            }
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 25%, #FEF08A 65%, #ECFDF5 100%);
+            min-height: 100vh;
+        }
+        .text-xs { font-size: 0.95rem !important; line-height: 1.55 !important; }
+        .text-sm { font-size: 1.08rem !important; line-height: 1.6 !important; }
+        .text-base { font-size: 1.25rem !important; line-height: 1.6 !important; }
+        .text-lg { font-size: 1.4rem !important; line-height: 1.5 !important; }
+        .text-xl { font-size: 1.6rem !important; line-height: 1.4 !important; }
+        .text-2xl { font-size: 1.9rem !important; line-height: 1.35 !important; }
+        .text-4xl { font-size: 2.3rem !important; line-height: 1.25 !important; }
+        .text-gray-400, .text-gray-500 {
+            color: #374151 !important;
+            font-weight: 500;
+        }
+        .text-gray-600 {
+            color: #1f2937 !important;
+            font-weight: 500;
+        }
+        input[type="text"], input[type="number"], input[type="date"], select {
+            font-size: 1.15rem !important;
+            padding: 0.65rem 0.85rem !important;
+        }
+        table th, table td {
+            font-size: 1.02rem !important;
+            padding: 0.85rem 0.75rem !important;
+        }
+        .matrix-table th, .matrix-table td {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.2rem !important;
+            line-height: 1.2 !important;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+        }
+        .active-tab {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.35);
+        }
+        .option-card input:checked + label {
+            border-color: #FF6B6B;
+            background-color: #FFF1F2;
+            color: #E11D48;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(225, 29, 72, 0.15);
+        }
+        .custom-scroll::-webkit-scrollbar {
+            height: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 9999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            .glass-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+        }
+    </style>
+</head>
+<body class="p-3 sm:p-6 md:p-8 text-gray-800">
+    <div class="max-w-6xl mx-auto space-y-6">
+
+        <header class="glass-card rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-56 h-56 bg-gradient-to-br from-orange-400 to-rose-400 rounded-full opacity-20 blur-2xl pointer-events-none"></div>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 text-amber-800 text-xs sm:text-sm font-bold rounded-full">
+                            <span>✨ 奇美醫院營養門診 專業陪伴</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                        </div>
+                        <div class="inline-flex items-center px-3 py-1 bg-rose-50 text-rose-700 border border-rose-300 text-xs sm:text-sm font-black rounded-full shadow-sm">
+                            <span>⚠️ 版權為奇美醫院營養科所有，請勿轉發</span>
+                        </div>
+                        <span id="roleBadge" class="hidden px-2.5 py-1 bg-purple-100 text-purple-800 border border-purple-300 text-xs font-bold rounded-full">
+                            👑 作者/營養師管理模式
+                        </span>
+                    </div>
+                    <h1 class="text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-rose-600 to-emerald-600">
+                        體重控制周計畫
+                    </h1>
+                    <p class="text-sm sm:text-base text-gray-600 mt-2 font-medium">
+                        每一天的小改變，都是蛻變的璀璨起點！記錄每一次達標，尋找減重改善適合方法，擁抱充滿力量與自信的健康體態。
+                    </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 no-print">
+                    <button onclick="openSyncModal()" class="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-2xl shadow-md transition-transform transform active:scale-95 text-xs sm:text-sm">
+                        <span>📊</span> 試算表同步與完整欄位設定
+                    </button>
+                    <button onclick="window.print()" class="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold rounded-2xl shadow-sm transition text-xs sm:text-sm">
+                        <span>🖨️</span> 下載計畫表 (PDF)
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <section class="glass-card rounded-3xl p-5 sm:p-6 shadow-lg">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xl">📋</span>
+                    <h3 class="font-bold text-gray-800 text-base sm:text-lg whitespace-nowrap">個案基本資料與成果追蹤</h3>
+                    <span id="patientStatusBadge" class="text-xs px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold rounded-full">
+                        🟢 已就緒
+                    </span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="promptDietitianLogin()" id="dietitianLockBtn" title="營養師登入以查閱所有個案" class="text-xs px-2.5 py-1 bg-gray-100 hover:bg-purple-100 text-gray-600 hover:text-purple-700 rounded-xl font-bold transition flex items-center gap-1">
+                        <span>🔐</span> 營養師身分切換
+                    </button>
+                    <div id="overallDeltaPill" class="hidden text-xs sm:text-sm font-bold px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full">
+                        🎉 與基準期相比：累計已減輕 0.0 kg
+                    </div>
+                </div>
+            </div>
+
+            <div id="dietitianPatientSelectorRow" class="hidden mt-3 p-3 bg-purple-50 rounded-2xl border border-purple-200 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-purple-900">👩‍⚕️ 切換查看個案：</span>
+                    <select id="allPatientsSelect" onchange="onSelectPatient(this.value)" class="bg-white border border-purple-300 rounded-xl text-xs py-1.5 px-3 font-bold text-gray-800 outline-none">
+                        <option value="">-- 請選擇個案 --</option>
+                    </select>
+                </div>
+                <button onclick="exportAllPatientsMasterCSV()" class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow transition flex items-center gap-1">
+                    <span>📑</span> 匯出全門診所有個案總彙整報表 (CSV)
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">
+                        個案姓名 <span class="text-rose-500">*</span> 
+                        <span class="text-[11px] text-emerald-600 font-bold">(輸入即時自動載入歷史)</span>
+                    </label>
+                    <input type="text" id="patientName" list="savedPatientNamesList" placeholder="輸入或選取姓名，例如：陳小美" 
+                        oninput="onPatientNameInput(this.value)" 
+                        onchange="onPatientNameChanged(this.value)" 
+                        class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-rose-400 outline-none">
+                    <datalist id="savedPatientNamesList"></datalist>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">開案 / 門診日期</label>
+                    <input type="date" id="startDate" onchange="saveProfileData()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-rose-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">目標體重 (Kg)</label>
+                    <input type="number" step="0.1" id="targetWeight" placeholder="例如：65.0" oninput="saveProfileData()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-rose-400 outline-none">
+                </div>
+            </div>
+        </section>
+
+        <nav class="glass-card rounded-2xl p-2 sm:p-3 shadow-md flex items-center justify-between gap-1 overflow-x-auto custom-scroll no-print" id="weekTabsContainer">
+        </nav>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <div class="lg:col-span-2 space-y-6">
+
+                <div class="glass-card rounded-3xl p-5 sm:p-6 shadow-lg">
+                    <div class="mb-4 space-y-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="p-2 bg-orange-100 text-orange-600 rounded-xl text-base">⚖️</span>
+                            <h2 class="text-lg sm:text-xl font-extrabold text-gray-800">
+                                <span id="currentWeekTitle">第 1 周</span> 晨間數據檢測
+                            </h2>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 pl-10">
+                            <span class="inline-flex items-center text-xs sm:text-sm bg-rose-50 text-rose-600 border border-rose-200/80 px-3 py-1 rounded-full font-bold">
+                                ✨ 空腹測量最準確
+                            </span>
+                            <span id="prevWeekReferenceBadge" class="hidden text-xs bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1 rounded-full font-bold">
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1">
+                        <div class="bg-gradient-to-br from-orange-50 to-orange-100/50 p-3 rounded-2xl border border-orange-200/60">
+                            <label class="block text-xs font-bold text-orange-800 mb-1">晨間空腹體重</label>
+                            <div class="flex items-baseline">
+                                <input type="number" step="0.1" id="metric-weight" placeholder="0.0" oninput="handleMetricChange('weight', this.value)" class="w-full bg-transparent text-xl font-black text-gray-800 outline-none placeholder-gray-400">
+                                <span class="text-xs font-bold text-gray-500 ml-1">Kg</span>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-amber-50 to-amber-100/50 p-3 rounded-2xl border border-amber-200/60">
+                            <label class="block text-xs font-bold text-amber-800 mb-1">體脂量</label>
+                            <div class="flex items-baseline">
+                                <input type="number" step="0.1" id="metric-fatMass" placeholder="0.0" oninput="handleMetricChange('fatMass', this.value)" class="w-full bg-transparent text-xl font-black text-gray-800 outline-none placeholder-gray-400">
+                                <span class="text-xs font-bold text-gray-500 ml-1">Kg</span>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-rose-50 to-rose-100/50 p-3 rounded-2xl border border-rose-200/60">
+                            <label class="block text-xs font-bold text-rose-800 mb-1">體脂率</label>
+                            <div class="flex items-baseline">
+                                <input type="number" step="0.1" id="metric-fatRate" placeholder="0.0" oninput="handleMetricChange('fatRate', this.value)" class="w-full bg-transparent text-xl font-black text-gray-800 outline-none placeholder-gray-400">
+                                <span class="text-xs font-bold text-gray-500 ml-1">%</span>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-3 rounded-2xl border border-emerald-200/60">
+                            <label class="block text-xs font-bold text-emerald-800 mb-1">肌肉量</label>
+                            <div class="flex items-baseline">
+                                <input type="number" step="0.1" id="metric-muscle" placeholder="0.0" oninput="handleMetricChange('muscle', this.value)" class="w-full bg-transparent text-xl font-black text-gray-800 outline-none placeholder-gray-400">
+                                <span class="text-xs font-bold text-gray-500 ml-1">Kg</span>
+                            </div>
+                        </div>
+                        <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-teal-50 to-teal-100/50 p-3 rounded-2xl border border-teal-200/60">
+                            <label class="block text-xs font-bold text-teal-800 mb-1">內臟脂肪</label>
+                            <div class="flex items-baseline">
+                                <input type="number" step="0.5" id="metric-visceralFat" placeholder="0" oninput="handleMetricChange('visceralFat', this.value)" class="w-full bg-transparent text-xl font-black text-gray-800 outline-none placeholder-gray-400">
+                                <span class="text-xs font-bold text-gray-500 ml-1">級</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-3xl p-5 sm:p-6 shadow-lg">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <span>📈</span> 體重、體脂量與肌肉量 趨勢曲線圖
+                        </h3>
+                        <div class="flex items-center gap-3 text-xs font-bold">
+                            <span class="inline-flex items-center gap-1 text-orange-600"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> 體重</span>
+                            <span class="inline-flex items-center gap-1 text-amber-600"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> 體脂量</span>
+                            <span class="inline-flex items-center gap-1 text-emerald-600"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> 肌肉量</span>
+                        </div>
+                    </div>
+                    <div class="h-60 sm:h-64 w-full relative">
+                        <canvas id="bodyTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-3xl p-5 sm:p-6 shadow-lg space-y-6">
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <h2 class="text-lg sm:text-xl font-bold text-gray-800 flex items-center gap-2">
+                                <span class="p-2 bg-rose-100 text-rose-600 rounded-xl text-base">🎯</span>
+                                本周執行目標評估 (共 11 項)
+                            </h2>
+                            <span class="text-xs text-gray-500">標準：完成 10分 | 3~5天 5分 | &lt;3天 0分</span>
+                        </div>
+                        <p class="text-xs text-gray-500">請依本周實際落實天數勾選，系統將自動計算累計分數與對應的因果回饋</p>
+                    </div>
+
+                    <div class="space-y-4" id="goalsListContainer">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="space-y-6">
+
+                <div class="glass-card rounded-3xl p-5 sm:p-6 shadow-lg text-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-b from-orange-50/50 to-transparent pointer-events-none"></div>
+                    <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">本周評估總得分</h3>
+                    
+                    <div class="flex items-center justify-center my-3">
+                        <div class="relative flex items-center justify-center">
+                            <div class="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-600" id="totalScoreDisplay">
+                                0
+                            </div>
+                            <span class="text-gray-400 text-lg font-bold ml-1.5 self-end mb-2">/ 110 分</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full bg-gray-200 h-3.5 rounded-full overflow-hidden my-3 p-0.5">
+                        <div id="scoreProgressBar" class="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-yellow-400 via-orange-500 to-emerald-500" style="width: 0%"></div>
+                    </div>
+
+                    <div id="scoreBadge" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-gray-100 text-gray-600 mt-1">
+                        尚未完成評估
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500 font-medium">
+                        <span>🌟 目標標準：80~90 分以上</span>
+                        <span id="scoreTargetStatus" class="font-bold text-amber-600">加油中！</span>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-3xl p-5 sm:p-6 shadow-lg space-y-5">
+                    <div class="flex items-center gap-2 pb-2 border-b border-gray-100">
+                        <span class="text-xl">💡</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-base">營養師專屬分析報告</h3>
+                            <p class="text-xs text-gray-400">習慣改變 ➔ 身體組成變化 正向因果回饋</p>
+                        </div>
+                    </div>
+
+                    <div id="progressMilestoneCard" class="bg-gradient-to-br from-amber-50/70 via-orange-50/50 to-emerald-50/70 border border-orange-200/80 rounded-2xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black text-orange-900 flex items-center gap-1">
+                                <span>🏆</span> 累積努力成果與身體正向回饋
+                            </span>
+                            <span id="progressCompareLabel" class="text-[11px] font-bold text-gray-500 bg-white/80 px-2 py-0.5 rounded-full border border-gray-200">
+                                與第 1 周相比
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 text-center" id="progressSummaryMetrics">
+                        </div>
+
+                        <div id="progressHabitsFeedback" class="text-xs text-gray-700 bg-white/90 p-3 rounded-xl border border-orange-100/80 space-y-2 leading-relaxed">
+                            <p class="text-gray-500 italic">請填寫晨間數據並勾選目標，系統將即時分析習慣落實與身體數據的正向因果關係！</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-xs font-bold text-rose-800 bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-200/60">
+                            <span>🌟</span>
+                            <span>榮耀榜！(完全達標 10分項目)</span>
+                        </div>
+                        <div id="doneContainer" class="text-xs text-gray-600 space-y-2 pl-1">
+                            <p class="italic text-gray-400">勾選後將顯示好習慣帶來的強大身心肯定...</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-1">
+                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200/60">
+                            <span>🌱</span>
+                            <span>表現亮眼！(執行 3~5 天項目)</span>
+                        </div>
+                        <div id="encourageContainer" class="text-xs text-gray-600 space-y-2 pl-1">
+                            <p class="italic text-gray-400">勾選後將顯示客製化肯定與微調建議...</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-1">
+                        <div class="flex items-center gap-2 text-xs font-bold text-amber-900 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200/60">
+                            <span>💪</span>
+                            <span>下周突破點！(需加油 &lt;3 天項目)</span>
+                        </div>
+                        <div id="needsFocusContainer" class="text-xs text-gray-600 space-y-2 pl-1">
+                            <p class="italic text-gray-400">勾選後將提供針對性的生活改善策略...</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-200/70 rounded-2xl p-4 text-xs space-y-3">
+                        <div class="flex items-center gap-2 font-bold text-rose-700 text-sm">
+                            <span>👩‍⚕️</span>
+                            <span>奇美門診營養師暖心叮嚀</span>
+                        </div>
+                        <p class="text-gray-600 leading-relaxed">
+                            減重是一場愛護自己的旅程，偶爾步調放緩非常正常！若本周總分未達 70 分、或對飲食計畫不清楚、52 輕斷食 / 蛋白質份數有疑問，歡迎隨時聯繫門診營養師預約專屬諮詢與方案微調！
+                        </p>
+
+                        <div class="bg-white/80 rounded-xl p-3 border border-rose-100 space-y-2">
+                            <div class="font-bold text-gray-800 flex items-center gap-1.5">
+                                <span>📞</span>
+                                <span>門診專屬預約電話：</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2 pl-5 font-semibold text-rose-600">
+                                <a href="tel:0911561359" class="hover:underline bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200/60 inline-flex items-center gap-1">
+                                    📱 0911-561-359
+                                </a>
+                                <span class="text-gray-400 font-normal">或</span>
+                                <a href="tel:062812811,52522" class="hover:underline bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200/60 inline-flex items-center gap-1">
+                                    ☎️ 06-2812811 #52522
+                                </a>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200/70 rounded-lg p-2 text-[11px] text-amber-900 leading-relaxed font-medium">
+                                <span class="font-bold">提醒🔔</span> 若與營養師預約好指定時間，無法前來請盡快聯絡改期，以免影響預約資格哦！
+                            </div>
+                        </div>
+
+                        <div class="pt-1 flex items-center justify-between text-rose-600 font-bold border-t border-rose-100/80">
+                            <span>奇美醫療財團法人奇美醫院 營養科門診</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+        <section class="glass-card rounded-3xl p-5 sm:p-7 shadow-lg space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-gray-100">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <span>📋</span> 八周全期數據對照總覽表
+                    </h3>
+                    <p class="text-xs text-gray-500 mt-0.5">一目了然看見 8 週各項數值與達標狀態轉變</p>
+                    <div class="mt-2 inline-block">
+                        <span class="text-red-600 font-extrabold text-sm sm:text-base tracking-wide border-b-2 border-black pb-0.5 animate-pulse inline-block">
+                            👉 來看看成績吧！請向右滑 ➔
+                        </span>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-xs no-print">
+                    <button onclick="downloadCSVReport()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow transition flex items-center gap-1">
+                        <span>📊</span> 匯出個人完整 Excel (CSV)
+                    </button>
+                    <button onclick="resetCurrentWeekData()" class="px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 font-bold rounded-xl hover:bg-rose-100 transition">
+                        重設本周
+                    </button>
+                    <button onclick="clearCurrentPatientData()" class="px-3 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 font-semibold rounded-xl transition">
+                        清空此個案
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto custom-scroll pb-2">
+                <table class="w-full text-left text-xs sm:text-sm border-collapse min-w-[760px]">
+                    <thead>
+                        <tr class="bg-gray-50/80 text-gray-700 font-bold border-b border-gray-200">
+                            <th class="p-3 w-48 sticky left-0 bg-gray-50/95 z-10">指標項目 / 周次</th>
+                            <th class="p-3 text-center">執行前</th>
+                            <th class="p-3 text-center">W1</th>
+                            <th class="p-3 text-center">W2</th>
+                            <th class="p-3 text-center">W3</th>
+                            <th class="p-3 text-center">W4</th>
+                            <th class="p-3 text-center">W5</th>
+                            <th class="p-3 text-center">W6</th>
+                            <th class="p-3 text-center">W7</th>
+                            <th class="p-3 text-center">W8</th>
+                        </tr>
+                    </thead>
+                    <tbody id="overviewTableBody" class="divide-y divide-gray-100">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="glass-card rounded-3xl p-5 sm:p-7 shadow-lg space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <span>🎯</span> 全期 11 項目標達成率
+                    </h3>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 text-xs font-bold text-gray-700 bg-white/70 px-3 py-1.5 rounded-2xl border border-gray-200/80">
+                    <span class="inline-flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-rose-600 inline-block shadow-sm shadow-rose-300"></span> 🔴 完成(10分)</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block shadow-sm"></span> 🟠 3~5天(5分)</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400 inline-block"></span> ⚪ &lt;3天(0分)</span>
+                </div>
+            </div>
+
+            <div class="w-full overflow-hidden">
+                <table class="w-full text-center border-collapse table-fixed matrix-table">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-orange-100/70 via-rose-50/70 to-emerald-100/70 text-gray-800 font-extrabold border-b border-gray-200">
+                            <th class="py-2 px-1 text-left w-[36%] sm:w-[32%]">習慣項目</th>
+                            <th class="py-2 px-0.5 w-[6%]">W1</th>
+                            <th class="py-2 px-0.5 w-[6%]">W2</th>
+                            <th class="py-2 px-0.5 w-[6%]">W3</th>
+                            <th class="py-2 px-0.5 w-[6%]">W4</th>
+                            <th class="py-2 px-0.5 w-[6%]">W5</th>
+                            <th class="py-2 px-0.5 w-[6%]">W6</th>
+                            <th class="py-2 px-0.5 w-[6%]">W7</th>
+                            <th class="py-2 px-0.5 w-[6%]">W8</th>
+                            <th class="py-2 px-1 w-[16%] sm:w-[14%] bg-rose-100/60 text-rose-800">達成率</th>
+                        </tr>
+                    </thead>
+                    <tbody id="goalDotMatrixBody" class="divide-y divide-gray-100 bg-white/60">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="glass-card rounded-3xl p-6 sm:p-8 shadow-xl text-center space-y-4 border-2 border-orange-200/80 bg-gradient-to-r from-orange-50 via-white to-amber-50">
+            <div class="max-w-2xl mx-auto space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-rose-100 text-rose-700 text-xs font-bold rounded-full">
+                    <span>🌟 本周填寫完成驗收</span>
+                </div>
+                <h3 class="text-xl sm:text-2xl font-black text-gray-800">
+                    點擊下方送出，為本周的努力留下榮耀足跡！
+                </h3>
+                <p class="text-xs sm:text-sm text-gray-600">
+                    確認當週數據與目標勾選無誤後，點擊送出即可自動儲存至本機個案檔案，並即時同步至門診雲端試算表完整欄位！
+                </p>
+            </div>
+
+            <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button id="mainSubmitBtn" onclick="submitWeeklyPlan()" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-orange-500 via-rose-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all transform active:scale-95 flex items-center justify-center gap-2 mx-auto">
+                    <span>🚀 確認送出本周紀錄</span>
+                </button>
+            </div>
+
+            <div id="lastSubmitInfo" class="text-xs text-gray-400 font-medium">
+                尚未送出記錄
+            </div>
+        </section>
+
+        <footer class="text-center text-xs sm:text-sm text-gray-600 py-6 space-y-2 border-t border-gray-200/60 mt-8">
+            <p class="font-bold text-gray-800 text-sm sm:text-base">
+                奇美醫療財團法人奇美醫院 營養科門診 體重控制周計畫 數位衛教系統
+            </p>
+            <p class="text-gray-400 text-xs">守護健康 ✦ 活出自信 ✦ 與您同行</p>
+        </footer>
+
+    </div>
+
+    <div id="syncModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-card bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <span>📊</span> 雲端試算表全欄位同步設定
+                </h3>
+                <button onclick="closeSyncModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">✕</button>
+            </div>
+
+            <div class="space-y-4 text-xs sm:text-sm text-gray-600">
+                <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 text-xs text-rose-900 space-y-1.5">
+                    <p class="font-bold text-sm">💡 為什麼試算表之前沒有全部展開？</p>
+                    <p>因為舊版的 Apps Script 只接收少數欄位，並把細項打包成代碼。只要將下方<strong>「全欄位 Apps Script 後端程式碼」</strong>複製並貼入您 Google 試算表的【擴充功能 ➔ Apps Script】，試算表就會自動展開所有欄位：<strong>體重、體脂量、體脂率、肌肉量、內臟脂肪、11 項目標詳細狀態</strong>，不再有一大串看不懂的代碼！</p>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Google Apps Script Web App 部署網址</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="sheetsApiUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono outline-none focus:bg-white focus:ring-2 focus:ring-emerald-400">
+                        <button onclick="saveApiUrlFromInput()" class="px-3 py-2 bg-gray-800 hover:bg-black text-white font-bold rounded-xl text-xs whitespace-nowrap">儲存網址</button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-gray-700">📑 試算表專用後端 Apps Script 原始碼 (全欄位完整版)：</span>
+                        <button onclick="copyAppsScriptCode()" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs shadow">
+                            📋 一鍵複製程式碼
+                        </button>
+                    </div>
+                    <textarea id="appsScriptCodeBox" readonly class="w-full h-36 p-3 bg-gray-900 text-emerald-400 font-mono text-[11px] rounded-xl outline-none select-all"></textarea>
+                </div>
+
+                <div class="pt-2 flex flex-col gap-2">
+                    <button onclick="syncToGoogleSheet()" id="syncSheetBtn" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                        <span>🚀 立即同步至試算表 (傳送完整全欄位)</span>
+                    </button>
+                    <button onclick="downloadCSVReport()" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition text-xs">
+                        📥 下載個人完整 Excel (CSV) 試算表檔
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyA5YTctUkT4mpHl8ADfgow0YLp__zZS66lmIEwvYDAz9hqSpW5HYlJUvOotCufM13n/exec";
+
+        const GOAL_DEFINITIONS = [
+            { id: 'water', label: '足夠水量', note: '(2500~3000 ml)', icon: '💧', adviceDone: '水分充足有效促進身體新陳代謝，加速假性飢餓代謝！', adviceMid: '喝水量已逐漸進步，建議隨身攜帶水壺提醒自己定時補充。', adviceLow: '水分嚴重不足容易導致代謝變慢與偽飢餓，建議每天目標補足 2500ml 以上。' },
+            { id: 'protein', label: '足夠蛋白質', note: '(12~16份)', icon: '🥩', adviceDone: '每餐蛋白質足量，為肌肉修復與燃脂提供頂級燃料！', adviceMid: '蛋白質攝取有起步，建議早餐與點心再多補充豆漿或雞蛋。', adviceLow: '蛋白質缺乏容易造成肌肉流失與基礎代謝率下降，請務必每餐補足蛋白質。' },
+            { id: 'vegetables', label: '足夠蔬菜', note: '(>5份, 早1午2晚2)', icon: '🥗', adviceDone: '高膳食纖維完美包覆油脂，有效穩定血糖並維持腸道健康！', adviceMid: '蔬菜量有增加，午晚餐可再多各加一碗深綠色蔬菜。', adviceLow: '膳食纖維缺乏容易導致血糖波動與便祕，請務必多攝取蔬菜。' },
+            { id: 'proteinSnack', label: '高蛋白點心', note: '(下午3點)', icon: '🥛', adviceDone: '下午三點優質高蛋白補給，成功消滅晚餐前的爆食慾望！', adviceMid: '點心時間可改為無糖豆漿或蛋白粉，減少高糖點心誘惑。', adviceLow: '下午若未及時補充蛋白質，容易引發晚間高熱量暴飲暴食。' },
+            { id: 'lowOil', label: '低油飲食', note: '(外食漂洗)', icon: '🥣', adviceDone: '落實外食過水漂洗減油，大幅降低身體隱形脂肪囤積！', adviceMid: '外食時可嘗試湯品去油、肉類去皮，慢慢減少油脂攝取。', adviceLow: '高油外食是脂肪囤積主要元兇，外食請務必試著漂洗過水。' },
+            { id: 'avoidSugar', label: '避免精製糖', note: '(含糖飲料/點心)', icon: '🚫', adviceDone: '徹底告別精製糖，體內胰島素趨於穩定，加速脂肪分解！', adviceMid: '手搖飲可先改為微糖或無糖茶，一步步擺脫糖分依賴。', adviceLow: '精製糖會引發脂肪快速合成，請下定決心先從減糖開始。' },
+            { id: 'earlyDinner', label: '減少晚進食', note: '(晚上8點前完成)', icon: '🌙', adviceDone: '晚上八點前完成晚餐，給予消化道充份休息與燃脂空檔！', adviceMid: '晚餐時間若較晚，建議調整為輕食高蛋白，減輕宵夜負擔。', adviceLow: '深夜進食會高度引發胰島素阻抗與脂肪合成，請盡量提早用餐。' },
+            { id: 'fasting52', label: '平原期', note: '(52輕斷食)', icon: '⏱️', adviceDone: '靈活運用 52 輕斷食突破平原期，開啟體內自我吞噬啟動燃脂！', adviceMid: '輕斷食日可先選 1~2 天逐步嘗試，補充高蛋白與低卡蔬菜。', adviceLow: '遇到體重平原期時，不妨尋求營養師規劃專屬輕斷食策略。' },
+            { id: 'sleep7h', label: '每日睡眠7小時', note: '(生活型態)', icon: '😴', adviceDone: '睡眠充足促進瘦體素分泌，自然消除不正常的餓感！', adviceMid: '盡量固定作息，睡前減少使用手機，提升深度睡眠品質。', adviceLow: '長期睡眠不足會提高皮質醇，加速腹部脂肪堆積，請多休息。' },
+            { id: 'aerobic150m', label: '有氧運動150分', note: '(生活型態)', icon: '🏃', adviceDone: '每週累積 150 分鐘有氧運動，大大提升心肺耐力與總卡路里消耗！', adviceMid: '每週可分開 3~4 次進行快走或慢跑，持之以恆最重要。', adviceLow: '缺乏運動會使燃脂效率放慢，建議每天從快走 15 分鐘開始。' },
+            { id: 'resistance3x', label: '阻力運動每周3次', note: '(生活型態)', icon: '🏋️', adviceDone: '每週落實 3 次阻力訓練（如深蹲/死蟲式），穩固燃脂肌肉引擎！', adviceMid: '可在家中進行徒手深蹲或棒式，逐步建立肌肉力量。', adviceLow: '減重若無阻力運動支持，極易流失肌肉，請加入基礎肌力訓練。' }
+        ];
+
+        let db = {
+            currentPatientName: "陳小美",
+            isDietitian: false,
+            apiUrl: DEFAULT_APPS_SCRIPT_URL,
+            patients: {}
+        };
+
+        let currentWeek = 1;
+        let bodyChart = null;
+
+        function initApp() {
+            loadDatabase();
+            setupDatalist();
+            selectPatient(db.currentPatientName || "陳小美");
+        }
+
+        function loadDatabase() {
+            const saved = localStorage.getItem('chimei_weight_plan_db_v2');
+            if (saved) {
+                try {
+                    db = JSON.parse(saved);
+                } catch(e) {
+                    db = { currentPatientName: "陳小美", isDietitian: false, apiUrl: DEFAULT_APPS_SCRIPT_URL, patients: {} };
+                }
+            }
+            db.apiUrl = DEFAULT_APPS_SCRIPT_URL;
+            if (!db.patients) db.patients = {};
+            if (document.getElementById('sheetsApiUrlInput')) {
+                document.getElementById('sheetsApiUrlInput').value = db.apiUrl;
+            }
+        }
+
+        function saveDatabase() {
+            localStorage.setItem('chimei_weight_plan_db_v2', JSON.stringify(db));
+        }
+
+        function getCurrentPatient() {
+            const name = db.currentPatientName || "陳小美";
+            if (!db.patients[name]) {
+                db.patients[name] = {
+                    profile: { name: name, startDate: new Date().toISOString().split('T')[0], targetWeight: "" },
+                    weeksData: {}
+                };
+            }
+            return db.patients[name];
+        }
+
+        function setupDatalist() {
+            const dl = document.getElementById('savedPatientNamesList');
+            if (!dl) return;
+            dl.innerHTML = '';
+            Object.keys(db.patients).forEach(pName => {
+                const opt = document.createElement('option');
+                opt.value = pName;
+                dl.appendChild(opt);
+            });
+        }
+
+        function selectPatient(name) {
+            if (!name || !name.trim()) return;
+            name = name.trim();
+            db.currentPatientName = name;
+            const patient = getCurrentPatient();
+            
+            document.getElementById('patientName').value = patient.profile.name || name;
+            document.getElementById('startDate').value = patient.profile.startDate || "";
+            document.getElementById('targetWeight').value = patient.profile.targetWeight || "";
+            
+            saveDatabase();
+            setupDatalist();
+            updatePatientStatusBadge();
+            renderWeekTabs();
+            loadCurrentWeekData();
+            renderOverviewTable();
+            renderGoalDotMatrix();
+            initBodyChart();
+        }
+
+        function onPatientNameInput(val) {
+            if (!val || !val.trim()) return;
+            val = val.trim();
+            if (db.patients[val]) {
+                selectPatient(val);
+            } else {
+                db.currentPatientName = val;
+                getCurrentPatient().profile.name = val;
+                saveDatabase();
+                updatePatientStatusBadge();
+            }
+        }
+
+        function onPatientNameChanged(val) {
+            if (!val || !val.trim()) return;
+            selectPatient(val.trim());
+        }
+
+        function saveProfileData() {
+            const patient = getCurrentPatient();
+            patient.profile.name = document.getElementById('patientName').value.trim() || db.currentPatientName;
+            patient.profile.startDate = document.getElementById('startDate').value;
+            patient.profile.targetWeight = document.getElementById('targetWeight').value;
+            saveDatabase();
+            renderOverviewTable();
+        }
+
+        function updatePatientStatusBadge() {
+            const patient = getCurrentPatient();
+            const badge = document.getElementById('patientStatusBadge');
+            const weeksCount = Object.keys(patient.weeksData || {}).length;
+            if (badge) {
+                badge.innerHTML = `🟢 已載入個案：${patient.profile.name} (${weeksCount} 週紀錄)`;
+            }
+            
+            const p0 = patient.weeksData[0]?.metrics?.weight;
+            const pCurr = patient.weeksData[currentWeek]?.metrics?.weight;
+            const pill = document.getElementById('overallDeltaPill');
+            if (p0 && pCurr && pill) {
+                const delta = (parseFloat(pCurr) - parseFloat(p0)).toFixed(1);
+                pill.classList.remove('hidden');
+                if (delta <= 0) {
+                    pill.className = "text-xs sm:text-sm font-bold px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full";
+                    pill.innerHTML = `🎉 與基準期相比：累計已減輕 ${Math.abs(delta)} kg`;
+                } else {
+                    pill.className = "text-xs sm:text-sm font-bold px-3 py-1 bg-amber-100 text-amber-800 rounded-full";
+                    pill.innerHTML = `📈 與基準期相比：微幅變動 +${delta} kg`;
+                }
+            } else if (pill) {
+                pill.classList.add('hidden');
+            }
+        }
+
+        function renderWeekTabs() {
+            const container = document.getElementById('weekTabsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const patient = getCurrentPatient();
+
+            for (let w = 0; w <= 8; w++) {
+                const btn = document.createElement('button');
+                const isCurrent = (w === currentWeek);
+                const hasData = patient.weeksData[w] && (patient.weeksData[w].metrics || patient.weeksData[w].goals);
+
+                let label = (w === 0) ? "🏁 執行前" : `第 ${w} 周`;
+                
+                btn.className = `px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1 whitespace-nowrap ${isCurrent ? 'active-tab' : 'bg-gray-100/80 hover:bg-gray-200/80 text-gray-700'}`;
+                btn.innerHTML = `
+                    <span>${label}</span>
+                    ${hasData ? '<span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>' : ''}
+                `;
+                btn.onclick = () => switchWeek(w);
+                container.appendChild(btn);
+            }
+        }
+
+        function switchWeek(w) {
+            currentWeek = w;
+            renderWeekTabs();
+            loadCurrentWeekData();
+            updatePrevWeekReferenceBadge();
+        }
+
+        function updatePrevWeekReferenceBadge() {
+            const badge = document.getElementById('prevWeekReferenceBadge');
+            if (!badge) return;
+
+            const patient = getCurrentPatient();
+            const prevW = currentWeek > 1 ? currentWeek - 1 : (currentWeek === 1 ? 0 : null);
+
+            if (prevW !== null && patient.weeksData[prevW] && patient.weeksData[prevW].metrics) {
+                const m = patient.weeksData[prevW].metrics;
+                const prevLabel = (prevW === 0) ? "執行前" : `第 ${prevW} 周`;
+                badge.classList.remove('hidden');
+                badge.innerHTML = `📌 前期對照 (${prevLabel})：體重 ${m.weight || '-'}kg | 體脂 ${m.fatMass || '-'}kg | 肌肉 ${m.muscle || '-'}kg`;
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function loadCurrentWeekData() {
+            const patient = getCurrentPatient();
+            const titleEl = document.getElementById('currentWeekTitle');
+            if (titleEl) {
+                titleEl.textContent = (currentWeek === 0) ? "執行前(基準期)" : `第 ${currentWeek} 周`;
+            }
+
+            const wData = patient.weeksData[currentWeek] || { metrics: {}, goals: {} };
+            const m = wData.metrics || {};
+            
+            document.getElementById('metric-weight').value = m.weight || "";
+            document.getElementById('metric-fatMass').value = m.fatMass || "";
+            document.getElementById('metric-fatRate').value = m.fatRate || "";
+            document.getElementById('metric-muscle').value = m.muscle || "";
+            document.getElementById('metric-visceralFat').value = m.visceralFat || "";
+
+            renderGoalsList(wData.goals || {});
+            calculateAndRenderScores();
+            updatePrevWeekReferenceBadge();
+            updatePatientStatusBadge();
+            updateChartData();
+        }
+
+        function handleMetricChange(field, val) {
+            const patient = getCurrentPatient();
+            if (!patient.weeksData[currentWeek]) patient.weeksData[currentWeek] = { metrics: {}, goals: {} };
+            if (!patient.weeksData[currentWeek].metrics) patient.weeksData[currentWeek].metrics = {};
+
+            patient.weeksData[currentWeek].metrics[field] = val;
+
+            if (field === 'weight' && patient.weeksData[currentWeek].metrics.fatRate) {
+                const w = parseFloat(val);
+                const fr = parseFloat(patient.weeksData[currentWeek].metrics.fatRate);
+                if (!isNaN(w) && !isNaN(fr) && w > 0 && fr > 0) {
+                    const fm = (w * (fr / 100)).toFixed(1);
+                    patient.weeksData[currentWeek].metrics.fatMass = fm;
+                    document.getElementById('metric-fatMass').value = fm;
+                }
+            }
+
+            saveDatabase();
+            updateChartData();
+            renderOverviewTable();
+            renderWeekTabs();
+            updatePatientStatusBadge();
+            calculateAndRenderScores();
+        }
+
+        function renderGoalsList(currentGoals) {
+            const container = document.getElementById('goalsListContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            GOAL_DEFINITIONS.forEach((g, idx) => {
+                const val = currentGoals[g.id] || '';
+                const card = document.createElement('div');
+                card.className = "bg-white/80 p-3.5 rounded-2xl border border-gray-100 shadow-sm space-y-2 hover:border-orange-200 transition";
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between flex-wrap gap-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">${g.icon}</span>
+                            <div>
+                                <span class="font-extrabold text-sm text-gray-800">${g.label}</span>
+                                <span class="text-xs text-orange-800 font-bold ml-1">${g.note}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 option-card text-xs font-bold pt-1">
+                        <div>
+                            <input type="radio" name="goal_${g.id}" id="goal_${g.id}_done" value="done" ${val === 'done' ? 'checked' : ''} onchange="handleGoalChange('${g.id}', 'done')" class="hidden">
+                            <label for="goal_${g.id}_done" class="block text-center py-2 px-1 rounded-xl bg-gray-50 border border-gray-200 cursor-pointer text-gray-600 transition">
+                                🔴 完成(10分)
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" name="goal_${g.id}" id="goal_${g.id}_mid" value="mid" ${val === 'mid' ? 'checked' : ''} onchange="handleGoalChange('${g.id}', 'mid')" class="hidden">
+                            <label for="goal_${g.id}_mid" class="block text-center py-2 px-1 rounded-xl bg-gray-50 border border-gray-200 cursor-pointer text-gray-600 transition">
+                                🟠 3~5天(5分)
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" name="goal_${g.id}" id="goal_${g.id}_low" value="low" ${val === 'low' ? 'checked' : ''} onchange="handleGoalChange('${g.id}', 'low')" class="hidden">
+                            <label for="goal_${g.id}_low" class="block text-center py-2 px-1 rounded-xl bg-gray-50 border border-gray-200 cursor-pointer text-gray-600 transition">
+                                ⚪ &lt;3天(0分)
+                            </label>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function handleGoalChange(goalId, val) {
+            const patient = getCurrentPatient();
+            if (!patient.weeksData[currentWeek]) patient.weeksData[currentWeek] = { metrics: {}, goals: {} };
+            if (!patient.weeksData[currentWeek].goals) patient.weeksData[currentWeek].goals = {};
+
+            patient.weeksData[currentWeek].goals[goalId] = val;
+            saveDatabase();
+            calculateAndRenderScores();
+            renderGoalDotMatrix();
+            renderWeekTabs();
+            renderOverviewTable();
+        }
+
+        function calculateAndRenderScores() {
+            const patient = getCurrentPatient();
+            const goals = patient.weeksData[currentWeek]?.goals || {};
+            let total = 0;
+            let count = 0;
+
+            GOAL_DEFINITIONS.forEach(g => {
+                const v = goals[g.id];
+                if (v === 'done') { total += 10; count++; }
+                else if (v === 'mid') { total += 5; count++; }
+                else if (v === 'low') { count++; }
+            });
+
+            document.getElementById('totalScoreDisplay').textContent = total;
+            const pct = Math.min(100, Math.round((total / 110) * 100));
+            document.getElementById('scoreProgressBar').style.width = pct + '%';
+
+            const badge = document.getElementById('scoreBadge');
+            const status = document.getElementById('scoreTargetStatus');
+
+            if (count === 0) {
+                badge.className = "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-gray-100 text-gray-600 mt-1";
+                badge.innerHTML = "尚未完成評估";
+                status.textContent = "加油中！";
+                status.className = "font-bold text-amber-600";
+            } else if (total >= 90) {
+                badge.className = "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-emerald-100 text-emerald-800 mt-1 shadow-sm";
+                badge.innerHTML = "🏆 表現卓越！極佳習慣養成";
+                status.textContent = "已完美達標！";
+                status.className = "font-bold text-emerald-600";
+            } else if (total >= 70) {
+                badge.className = "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-amber-100 text-amber-800 mt-1";
+                badge.innerHTML = "🌟 步入正軌！穩定前進中";
+                status.textContent = "接近目標！";
+                status.className = "font-bold text-amber-600";
+            } else {
+                badge.className = "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-rose-100 text-rose-800 mt-1";
+                badge.innerHTML = "🌱 微調突破！營養師貼心陪伴";
+                status.textContent = "下周再加油！";
+                status.className = "font-bold text-rose-600";
+            }
+
+            renderFeedbackSections(goals);
+            updateProgressMilestone();
+        }
+
+        function updateProgressMilestone() {
+            const patient = getCurrentPatient();
+            const currM = patient.weeksData[currentWeek]?.metrics || {};
+            const refW = (currentWeek > 1 && patient.weeksData[1]?.metrics) ? 1 : 0;
+            const baseM = patient.weeksData[refW]?.metrics || {};
+            const refLabel = (refW === 0) ? "與執行前相比" : "與第 1 周相比";
+
+            document.getElementById('progressCompareLabel').textContent = refLabel;
+
+            const summaryMetricsEl = document.getElementById('progressSummaryMetrics');
+            const feedbackEl = document.getElementById('progressHabitsFeedback');
+
+            let wDelta = (currM.weight && baseM.weight) ? (parseFloat(currM.weight) - parseFloat(baseM.weight)).toFixed(1) : null;
+            let fDelta = (currM.fatMass && baseM.fatMass) ? (parseFloat(currM.fatMass) - parseFloat(baseM.fatMass)).toFixed(1) : null;
+            let mDelta = (currM.muscle && baseM.muscle) ? (parseFloat(currM.muscle) - parseFloat(baseM.muscle)).toFixed(1) : null;
+
+            summaryMetricsEl.innerHTML = `
+                <div class="bg-white/90 p-2 rounded-xl border border-orange-100">
+                    <span class="block text-[11px] text-gray-500 font-bold">體重增減</span>
+                    <span class="text-sm font-black ${wDelta <= 0 ? 'text-emerald-600' : 'text-rose-600'}">
+                        ${wDelta !== null ? (wDelta <= 0 ? `${wDelta} kg` : `+${wDelta} kg`) : '-'}
+                    </span>
+                </div>
+                <div class="bg-white/90 p-2 rounded-xl border border-orange-100">
+                    <span class="block text-[11px] text-gray-500 font-bold">體脂肪量</span>
+                    <span class="text-sm font-black ${fDelta <= 0 ? 'text-emerald-600' : 'text-rose-600'}">
+                        ${fDelta !== null ? (fDelta <= 0 ? `${fDelta} kg` : `+${fDelta} kg`) : '-'}
+                    </span>
+                </div>
+                <div class="bg-white/90 p-2 rounded-xl border border-orange-100">
+                    <span class="block text-[11px] text-gray-500 font-bold">肌肉量</span>
+                    <span class="text-sm font-black ${mDelta >= 0 ? 'text-emerald-600' : 'text-amber-600'}">
+                        ${mDelta !== null ? (mDelta >= 0 ? `+${mDelta} kg` : `${mDelta} kg`) : '-'}
+                    </span>
+                </div>
+            `;
+
+            const goals = patient.weeksData[currentWeek]?.goals || {};
+            let causes = [];
+
+            if (goals.lowOil === 'done' || goals.avoidSugar === 'done' || goals.earlyDinner === 'done') {
+                causes.push("低油過水漂洗、控糖與提早用餐有效穩定了胰島素濃度，促進脂肪持續燃燒");
+            }
+            if (goals.protein === 'done' || goals.proteinSnack === 'done') {
+                causes.push("充足蛋白質補給成功維護了燃脂肌肉引擎，避免蛋白質缺乏導致肌肉流失");
+            }
+            if (goals.water === 'done') {
+                causes.push("每日足量飲水有效促進體內代謝，排除多餘滯留水分與偽飢餓感");
+            }
+            if (goals.resistance3x === 'done' || goals.aerobic150m === 'done') {
+                causes.push("規律運動與阻力訓練為身體帶來正向刺激，維持極佳的基礎代謝率");
+            }
+
+            if (causes.length === 0) {
+                feedbackEl.innerHTML = `<p class="text-gray-500 italic">持續勾選並落實每週習慣，系統將為您分析好習慣帶來的身體正向連結與變革！</p>`;
+            } else {
+                let text = `<div class="font-bold text-emerald-800 mb-1">✨ 覺察良好控制下的身體正向變化：</div>`;
+                text += `<ul class="list-disc pl-4 space-y-1 text-gray-700">`;
+                causes.forEach(c => text += `<li>${c}</li>`);
+                text += `</ul>`;
+                feedbackEl.innerHTML = text;
+            }
+        }
+
+        function renderFeedbackSections(goals) {
+            const doneContainer = document.getElementById('doneContainer');
+            const encourageContainer = document.getElementById('encourageContainer');
+            const needsFocusContainer = document.getElementById('needsFocusContainer');
+
+            doneContainer.innerHTML = '';
+            encourageContainer.innerHTML = '';
+            needsFocusContainer.innerHTML = '';
+
+            let doneCount = 0, midCount = 0, lowCount = 0;
+
+            GOAL_DEFINITIONS.forEach(g => {
+                const status = goals[g.id];
+                if (status === 'done') {
+                    doneCount++;
+                    doneContainer.appendChild(createFeedbackItem(g.icon, g.label, g.adviceDone, 'rose'));
+                } else if (status === 'mid') {
+                    midCount++;
+                    encourageContainer.appendChild(createFeedbackItem(g.icon, g.label, g.adviceMid, 'emerald'));
+                } else if (status === 'low') {
+                    lowCount++;
+                    needsFocusContainer.appendChild(createFeedbackItem(g.icon, g.label, g.adviceLow, 'amber'));
+                }
+            });
+
+            if (doneCount === 0) doneContainer.innerHTML = `<p class="italic text-gray-400">當前尚未有 10 分完全達標項目，點擊上方勾選後將給予讚賞！</p>`;
+            if (midCount === 0) encourageContainer.innerHTML = `<p class="italic text-gray-400">當前無 3~5 天執行項目。</p>`;
+            if (lowCount === 0) needsFocusContainer.innerHTML = `<p class="italic text-gray-400">太棒了！目前沒有未達 3 天的需要加油項目。</p>`;
+        }
+
+        function createFeedbackItem(icon, label, text, themeColor) {
+            const div = document.createElement('div');
+            div.className = `p-2.5 bg-white/80 rounded-xl border border-${themeColor}-100 flex items-start gap-2 shadow-sm`;
+            div.innerHTML = `
+                <span class="text-base flex-shrink-0 mt-0.5">${icon}</span>
+                <div>
+                    <span class="font-bold text-gray-800 text-xs">${label}：</span>
+                    <span class="text-gray-600 text-xs">${text}</span>
+                </div>
+            `;
+            return div;
+        }
+
+        function initBodyChart() {
+            const canvas = document.getElementById('bodyTrendChart');
+            if (!canvas) return;
+
+            // 安全銷毀既有圖表實例，避免重複綁定同一個 Canvas 報錯
+            const existingChart = Chart.getChart(canvas);
+            if (existingChart) {
+                existingChart.destroy();
+            }
+            if (bodyChart) {
+                try {
+                    bodyChart.destroy();
+                } catch (e) {
+                    // 忽略例外
+                }
+                bodyChart = null;
+            }
+
+            const ctx = canvas.getContext('2d');
+            bodyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['執行前', 'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'],
+                    datasets: [
+                        { label: '體重 (Kg)', data: [], borderColor: '#F97316', backgroundColor: 'rgba(249, 115, 22, 0.1)', borderWidth: 3, tension: 0.3, fill: true },
+                        { label: '體脂量 (Kg)', data: [], borderColor: '#F59E0B', borderWidth: 2, borderDash: [4, 4], tension: 0.3 },
+                        { label: '肌肉量 (Kg)', data: [], borderColor: '#10B981', borderWidth: 2, tension: 0.3 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+            updateChartData();
+        }
+
+        function updateChartData() {
+            if (!bodyChart) return;
+            const patient = getCurrentPatient();
+
+            const weights = [], fats = [], muscles = [];
+            for (let w = 0; w <= 8; w++) {
+                const m = patient.weeksData[w]?.metrics || {};
+                weights.push(m.weight ? parseFloat(m.weight) : null);
+                fats.push(m.fatMass ? parseFloat(m.fatMass) : null);
+                muscles.push(m.muscle ? parseFloat(m.muscle) : null);
+            }
+
+            bodyChart.data.datasets[0].data = weights;
+            bodyChart.data.datasets[1].data = fats;
+            bodyChart.data.datasets[2].data = muscles;
+            bodyChart.update();
+        }
+
+        function renderOverviewTable() {
+            const tbody = document.getElementById('overviewTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const patient = getCurrentPatient();
+
+            const rowsConfig = [
+                { title: '晨間空腹體重 (Kg)', key: 'weight' },
+                { title: '體脂肪量 (Kg)', key: 'fatMass' },
+                { title: '體脂率 (%)', key: 'fatRate' },
+                { title: '肌肉量 (Kg)', key: 'muscle' },
+                { title: '內臟脂肪 (級)', key: 'visceralFat' },
+                { title: '本周總得分', isScore: true }
+            ];
+
+            rowsConfig.forEach(cfg => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-orange-50/50 transition";
+
+                let html = `<td class="p-3 font-bold text-gray-800 sticky left-0 bg-white/95 shadow-sm">${cfg.title}</td>`;
+
+                for (let w = 0; w <= 8; w++) {
+                    const wData = patient.weeksData[w] || {};
+                    if (cfg.isScore) {
+                        if (w === 0) {
+                            html += `<td class="p-3 text-center text-gray-400 font-bold">-</td>`;
+                        } else {
+                            let total = 0, count = 0;
+                            const goals = wData.goals || {};
+                            GOAL_DEFINITIONS.forEach(g => {
+                                if (goals[g.id] === 'done') { total += 10; count++; }
+                                else if (goals[g.id] === 'mid') { total += 5; count++; }
+                                else if (goals[g.id] === 'low') { count++; }
+                            });
+                            html += `<td class="p-3 text-center font-black ${total >= 80 ? 'text-emerald-600' : 'text-orange-600'}">${count > 0 ? total + '分' : '-'}</td>`;
+                        }
+                    } else {
+                        const val = wData.metrics ? wData.metrics[cfg.key] : null;
+                        html += `<td class="p-3 text-center font-bold text-gray-700">${val || '-'}</td>`;
+                    }
+                }
+                tr.innerHTML = html;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderGoalDotMatrix() {
+            const tbody = document.getElementById('goalDotMatrixBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const patient = getCurrentPatient();
+
+            GOAL_DEFINITIONS.forEach(g => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-orange-50/40 transition border-b border-gray-100/60";
+
+                let rowHtml = `
+                    <td class="py-2 px-1 text-left bg-white/80">
+                        <div class="font-extrabold text-gray-800 leading-tight">${g.label}</div>
+                        <div class="text-[10px] text-orange-800 font-bold leading-tight">${g.note}</div>
+                    </td>
+                `;
+
+                let doneWeeks = 0;
+                let activeWeeksCount = 0;
+
+                for (let w = 1; w <= 8; w++) {
+                    const status = patient.weeksData[w]?.goals ? patient.weeksData[w].goals[g.id] : null;
+                    let dotHtml = `<span class="text-gray-300 font-normal text-[10px]">-</span>`;
+
+                    if (status === 'done') {
+                        doneWeeks++;
+                        activeWeeksCount++;
+                        dotHtml = `<span class="inline-block w-3.5 h-3.5 rounded-full bg-rose-600 shadow-sm shadow-rose-300 transform scale-110" title="W${w}: 完成(10分)"></span>`;
+                    } else if (status === 'mid') {
+                        doneWeeks += 0.5;
+                        activeWeeksCount++;
+                        dotHtml = `<span class="inline-block w-3 h-3 rounded-full bg-amber-400 shadow-sm" title="W${w}: 3~5天(5分)"></span>`;
+                    } else if (status === 'low') {
+                        activeWeeksCount++;
+                        dotHtml = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-300 border border-gray-400" title="W${w}: <3天(0分)"></span>`;
+                    }
+
+                    rowHtml += `<td class="py-2 px-0.5 align-middle">${dotHtml}</td>`;
+                }
+
+                const rate = activeWeeksCount > 0 ? Math.round((doneWeeks / activeWeeksCount) * 100) : 0;
+                rowHtml += `
+                    <td class="py-2 px-1 font-black bg-rose-50/50 text-rose-700 text-xs">
+                        ${activeWeeksCount > 0 ? `${rate}%` : '-'}
+                    </td>
+                `;
+
+                tr.innerHTML = rowHtml;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function submitWeeklyPlan() {
+            const patient = getCurrentPatient();
+            if (!patient.profile.name) {
+                alert("請先輸入個案姓名再進行送出！");
+                document.getElementById('patientName').focus();
+                return;
+            }
+
+            saveDatabase();
+            const timeStr = new Date().toLocaleString('zh-TW');
+            document.getElementById('lastSubmitInfo').textContent = `✅ 已於 ${timeStr} 儲存至本機個案歷史檔`;
+
+            syncToGoogleSheet();
+        }
+
+        function promptDietitianLogin() {
+            const pwd = prompt("🔐 請輸入作者/門診營養師管理密碼：", "");
+            if (pwd === 'chimei888') {
+                db.isDietitian = true;
+                saveDatabase();
+                applyDietitianModeUI();
+                alert("👑 密碼正確！已切換至【作者/門診營養師管理模式】，可檢視門診所有個案並匯出總報表。");
+            } else if (pwd !== null) {
+                alert("❌ 密碼錯誤，無法切換權限。");
+            }
+        }
+
+        function applyDietitianModeUI() {
+            const badge = document.getElementById('roleBadge');
+            const row = document.getElementById('dietitianPatientSelectorRow');
+            if (db.isDietitian) {
+                if (badge) badge.classList.remove('hidden');
+                if (row) row.classList.remove('hidden');
+                populatePatientsSelect();
+            }
+        }
+
+        function populatePatientsSelect() {
+            const sel = document.getElementById('allPatientsSelect');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">-- 請選取個案 --</option>';
+            Object.keys(db.patients).forEach(pName => {
+                const opt = document.createElement('option');
+                opt.value = pName;
+                opt.textContent = pName;
+                if (pName === db.currentPatientName) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+
+        function onSelectPatient(pName) {
+            if (!pName) return;
+            selectPatient(pName);
+        }
+
+        function openSyncModal() {
+            document.getElementById('syncModal').classList.remove('hidden');
+            const box = document.getElementById('appsScriptCodeBox');
+            if (box) {
+                box.value = `/**
  * 奇美醫院營養門診 - 體重控制周計畫
  * Google Apps Script 雲端試算表完整全欄位處理程式
  */
@@ -8,33 +1250,15 @@ function doPost(e) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     var data = JSON.parse(e.postData.contents);
     
-    // 定義完整的 22 個中文字段表頭
     var HEADERS = [
-      "同步時間",
-      "個案姓名",
-      "開案日期",
-      "目標體重(kg)",
-      "填寫週次",
-      "空腹體重(kg)",
-      "體脂量(kg)",
-      "體脂率(%)",
-      "肌肉量(kg)",
-      "內臟脂肪(級)",
-      "本週總得分",
-      "1.足夠水量(2500~3000ml)",
-      "2.足夠蛋白質(12~16份)",
-      "3.足夠蔬菜(>5份)",
-      "4.下午3點高蛋白點心",
-      "5.低油飲食(漂洗)",
-      "6.避免精製糖",
-      "7.減少晚進食(晚上8點前)",
-      "8.平原期(52輕斷食)",
-      "9.每日睡眠7小時",
-      "10.有氧運動150分",
-      "11.阻力運動3次"
+      "同步時間", "個案姓名", "開案日期", "目標體重(kg)", "填寫週次",
+      "空腹體重(kg)", "體脂量(kg)", "體脂率(%)", "肌肉量(kg)", "內臟脂肪(級)", "本週總得分",
+      "1.足夠水量(2500~3000ml)", "2.足夠蛋白質(12~16份)", "3.足夠蔬菜(>5份)",
+      "4.下午3點高蛋白點心", "5.低油飲食(漂洗)", "6.避免精製糖",
+      "7.減少晚進食(晚上8點前)", "8.平原期(52輕斷食)", "9.每日睡眠7小時",
+      "10.有氧運動150分", "11.阻力運動3次"
     ];
     
-    // 若試算表為全新空白，自動寫入第一行表頭並設置樣式
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(HEADERS);
       var headerRange = sheet.getRange(1, 1, 1, HEADERS.length);
@@ -42,7 +1266,6 @@ function doPost(e) {
       headerRange.setFontWeight("bold");
     }
     
-    // 取得基本資料與週次
     var profile = data.profile || {};
     var currentWeek = data.currentWeek !== undefined ? data.currentWeek : 1;
     var weekName = (currentWeek === 0) ? "執行前(基準期)" : ("第 " + currentWeek + " 周");
@@ -51,19 +1274,9 @@ function doPost(e) {
     var m = wData.metrics || {};
     var g = wData.goals || {};
     
-    // 計算總分與目標對應文字
     var totalScore = 0;
-    var goalTextMap = {
-      "done": "完成 (10分)",
-      "mid": "3~5天 (5分)",
-      "low": "<3天 (0分)"
-    };
-    
-    var goalKeys = [
-      'water', 'protein', 'vegetables', 'proteinSnack', 
-      'lowOil', 'avoidSugar', 'earlyDinner', 'fasting52', 
-      'sleep7h', 'aerobic150m', 'resistance3x'
-    ];
+    var goalTextMap = { "done": "完成 (10分)", "mid": "3~5天 (5分)", "low": "<3天 (0分)" };
+    var goalKeys = ['water', 'protein', 'vegetables', 'proteinSnack', 'lowOil', 'avoidSugar', 'earlyDinner', 'fasting52', 'sleep7h', 'aerobic150m', 'resistance3x'];
     
     var goalOutputs = [];
     goalKeys.forEach(function(k) {
@@ -73,7 +1286,6 @@ function doPost(e) {
       goalOutputs.push(goalTextMap[val] || "-");
     });
     
-    // 組合整列資料（共 22 欄，全部展開，沒有代碼）
     var timeStr = Utilities.formatDate(new Date(), "Asia/Taipei", "yyyy-MM-dd HH:mm:ss");
     var row = [
       timeStr,
@@ -89,13 +1301,168 @@ function doPost(e) {
       currentWeek === 0 ? "基準期" : (totalScore + " 分")
     ].concat(goalOutputs);
     
-    // 寫入試算表新列
     sheet.appendRow(row);
     
-    return ContentService.createTextOutput(JSON.stringify({ status: "success", rowAdded: true }))
+    return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
-}
+}`;
+            }
+        }
+
+        function closeSyncModal() {
+            document.getElementById('syncModal').classList.add('hidden');
+        }
+
+        function saveApiUrlFromInput() {
+            const url = document.getElementById('sheetsApiUrlInput').value.trim();
+            if (!url) return;
+            db.apiUrl = url;
+            saveDatabase();
+            alert("✅ Google Apps Script Web App 網址儲存成功！");
+        }
+
+        function copyAppsScriptCode() {
+            const box = document.getElementById('appsScriptCodeBox');
+            box.select();
+            document.execCommand('copy');
+            alert("📋 Apps Script 純後端程式碼已一鍵複製！請至 Google 試算表貼上。");
+        }
+
+        function syncToGoogleSheet() {
+            const url = db.apiUrl || DEFAULT_APPS_SCRIPT_URL;
+            const patient = getCurrentPatient();
+            
+            const btn = document.getElementById('mainSubmitBtn');
+            if (btn) btn.innerHTML = "⏳ 同步傳送中...";
+
+            const payload = {
+                timestamp: new Date().toISOString(),
+                profile: patient.profile,
+                currentWeek: currentWeek,
+                weeksData: patient.weeksData
+            };
+
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert("🚀 資料已順利同步傳送至 Google 雲端試算表！");
+                if (btn) btn.innerHTML = "<span>🚀 確認送出本周紀錄</span>";
+            }).catch(err => {
+                alert("⚠️ 同步至雲端時出錯，已備份至本機！ error: " + err);
+                if (btn) btn.innerHTML = "<span>🚀 確認送出本周紀錄</span>";
+            });
+        }
+
+        function downloadCSVReport() {
+            const patient = getCurrentPatient();
+            let csv = "\uFEFF";
+            csv += "奇美醫院營養門診 - 體重控制周計畫 個人完整報表\n";
+            csv += `個案姓名,${patient.profile.name}\n`;
+            csv += `開案日期,${patient.profile.startDate || '-'}\n`;
+            csv += `目標體重,${patient.profile.targetWeight || '-'} kg\n`;
+            csv += `備註,⚠️ 版權為奇美醫院營養科所有 請勿轉發\n\n`;
+
+            csv += "週次,空腹體重(kg),體脂量(kg),體脂率(%),肌肉量(kg),內臟脂肪(級),總得分\n";
+
+            for (let w = 0; w <= 8; w++) {
+                const label = (w === 0) ? "執行前" : `第${w}周`;
+                const m = patient.weeksData[w]?.metrics || {};
+                
+                let score = 0;
+                if (w > 0) {
+                    const goals = patient.weeksData[w]?.goals || {};
+                    GOAL_DEFINITIONS.forEach(g => {
+                        if (goals[g.id] === 'done') score += 10;
+                        else if (goals[g.id] === 'mid') score += 5;
+                    });
+                }
+
+                csv += `${label},${m.weight || '-'},${m.fatMass || '-'},${m.fatRate || '-'},${m.muscle || '-'},${m.visceralFat || '-'},${w === 0 ? '-' : score + '分'}\n`;
+            }
+
+            csv += "\n全期 11 項目標落實細節\n";
+            csv += "習慣項目," + GOAL_DEFINITIONS.map(g => `"${g.label}"`).join(",") + "\n";
+
+            for (let w = 1; w <= 8; w++) {
+                const goals = patient.weeksData[w]?.goals || {};
+                const row = GOAL_DEFINITIONS.map(g => {
+                    const st = goals[g.id];
+                    if (st === 'done') return "完成(10分)";
+                    if (st === 'mid') return "3~5天(5分)";
+                    if (st === 'low') return "<3天(0分)";
+                    return "-";
+                });
+                csv += `第${w}周,` + row.join(",") + "\n";
+            }
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `奇美營養門診_${patient.profile.name}_週計畫報表.csv`;
+            link.click();
+        }
+
+        function exportAllPatientsMasterCSV() {
+            if (!db.isDietitian) return;
+            let csv = "\uFEFF";
+            csv += "奇美醫院營養門診 - 全門診所有個案總彙整報表\n\n";
+            csv += "個案姓名,開案日期,目標體重,填寫週次,空腹體重,體脂量,體脂率,肌肉量,內臟脂肪,週評估得分\n";
+
+            Object.keys(db.patients).forEach(pName => {
+                const p = db.patients[pName];
+                for (let w = 0; w <= 8; w++) {
+                    const wData = p.weeksData[w];
+                    if (wData) {
+                        const m = wData.metrics || {};
+                        let score = 0;
+                        if (w > 0 && wData.goals) {
+                            GOAL_DEFINITIONS.forEach(g => {
+                                if (wData.goals[g.id] === 'done') score += 10;
+                                else if (wData.goals[g.id] === 'mid') score += 5;
+                            });
+                        }
+                        csv += `${pName},${p.profile.startDate || '-'},${p.profile.targetWeight || '-'},${w === 0 ? '執行前' : '第'+w+'周'},${m.weight || '-'},${m.fatMass || '-'},${m.fatRate || '-'},${m.muscle || '-'},${m.visceralFat || '-'},${w === 0 ? '-' : score + '分'}\n`;
+                    }
+                }
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `奇美營養門診_全門診總彙整報表_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        function resetCurrentWeekData() {
+            if (confirm(`確定要重設【第 ${currentWeek} 周】的所有填寫數據嗎？`)) {
+                const patient = getCurrentPatient();
+                delete patient.weeksData[currentWeek];
+                saveDatabase();
+                loadCurrentWeekData();
+                renderOverviewTable();
+                renderGoalDotMatrix();
+                renderWeekTabs();
+            }
+        }
+
+        function clearCurrentPatientData() {
+            const patient = getCurrentPatient();
+            if (confirm(`⚠️ 確定要刪除個案【${patient.profile.name}】的所有歷史資料嗎？此動作無法復原。`)) {
+                delete db.patients[patient.profile.name];
+                db.currentPatientName = "陳小美";
+                saveDatabase();
+                initApp();
+            }
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
