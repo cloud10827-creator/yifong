@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+/**
+ * 奇美醫院營養門診 - 體重控制周計畫
+ * Google Apps Script 雲端試算表完整全欄位處理程式
+ */
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    // 定義完整的 22 個中文字段表頭
+    var HEADERS = [
+      "同步時間",
+      "個案姓名",
+      "開案日期",
+      "目標體重(kg)",
+      "填寫週次",
+      "空腹體重(kg)",
+      "體脂量(kg)",
+      "體脂率(%)",
+      "肌肉量(kg)",
+      "內臟脂肪(級)",
+      "本週總得分",
+      "1.足夠水量(2500~3000ml)",
+      "2.足夠蛋白質(12~16份)",
+      "3.足夠蔬菜(>5份)",
+      "4.下午3點高蛋白點心",
+      "5.低油飲食(漂洗)",
+      "6.避免精製糖",
+      "7.減少晚進食(晚上8點前)",
+      "8.平原期(52輕斷食)",
+      "9.每日睡眠7小時",
+      "10.有氧運動150分",
+      "11.阻力運動3次"
+    ];
+    
+    // 若試算表為全新空白，自動寫入第一行表頭並設置樣式
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(HEADERS);
+      var headerRange = sheet.getRange(1, 1, 1, HEADERS.length);
+      headerRange.setBackground("#FFEDD5");
+      headerRange.setFontWeight("bold");
+    }
+    
+    // 取得基本資料與週次
+    var profile = data.profile || {};
+    var currentWeek = data.currentWeek !== undefined ? data.currentWeek : 1;
+    var weekName = (currentWeek === 0) ? "執行前(基準期)" : ("第 " + currentWeek + " 周");
+    
+    var wData = (data.weeksData && data.weeksData[currentWeek]) ? data.weeksData[currentWeek] : {};
+    var m = wData.metrics || {};
+    var g = wData.goals || {};
+    
+    // 計算總分與目標對應文字
+    var totalScore = 0;
+    var goalTextMap = {
+      "done": "完成 (10分)",
+      "mid": "3~5天 (5分)",
+      "low": "<3天 (0分)"
+    };
+    
+    var goalKeys = [
+      'water', 'protein', 'vegetables', 'proteinSnack', 
+      'lowOil', 'avoidSugar', 'earlyDinner', 'fasting52', 
+      'sleep7h', 'aerobic150m', 'resistance3x'
+    ];
+    
+    var goalOutputs = [];
+    goalKeys.forEach(function(k) {
+      var val = g[k];
+      if (val === 'done') totalScore += 10;
+      else if (val === 'mid') totalScore += 5;
+      goalOutputs.push(goalTextMap[val] || "-");
+    });
+    
+    // 組合整列資料（共 22 欄，全部展開，沒有代碼）
+    var timeStr = Utilities.formatDate(new Date(), "Asia/Taipei", "yyyy-MM-dd HH:mm:ss");
+    var row = [
+      timeStr,
+      profile.name || "未填寫",
+      profile.startDate || "-",
+      profile.targetWeight ? (profile.targetWeight + " kg") : "-",
+      weekName,
+      m.weight ? m.weight : "-",
+      m.fatMass ? m.fatMass : "-",
+      m.fatRate ? m.fatRate : "-",
+      m.muscle ? m.muscle : "-",
+      m.visceralFat ? m.visceralFat : "-",
+      currentWeek === 0 ? "基準期" : (totalScore + " 分")
+    ].concat(goalOutputs);
+    
+    // 寫入試算表新列
+    sheet.appendRow(row);
+    
+    return ContentService.createTextOutput(JSON.stringify({ status: "success", rowAdded: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
