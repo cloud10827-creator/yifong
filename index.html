@@ -1,1367 +1,423 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>奇美醫院營養門診 - 體重控制周計畫</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js for Trend Charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
-        
-        body {
-            font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
-            background-color: #F8FAFC;
-            color: #1E293B;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-        }
-
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printableReport, #printableReport * {
-                visibility: visible;
-            }
-            #printableReport {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                margin: 0;
-                padding: 16px;
-            }
-            .no-print {
-                display: none !important;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>體重控制周計畫 - 奇美醫療財團法人奇美醫院 營養科門診</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", Roboto, sans-serif;
+      background-color: #fdfbf7;
+      color: #334155;
+      -webkit-font-smoothing: antialiased;
+    }
+    .main-container {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .card-base {
+      background: #ffffff;
+      border-radius: 1.5rem;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+    }
+    /* 漸層名片卡 */
+    .prescription-card {
+      background: linear-gradient(135deg, #fff7ed 0%, #fef2f2 50%, #f0fdf4 100%);
+      border: 1.5px solid #fed7aa;
+      border-radius: 1.25rem;
+    }
+    /* 5大指標顏色卡片 */
+    .metric-box-yellow {
+      background-color: #fefce8;
+      border: 1.5px solid #fef08a;
+      border-radius: 1rem;
+    }
+    .metric-box-pink {
+      background-color: #fff1f2;
+      border: 1.5px solid #fecdd3;
+      border-radius: 1rem;
+    }
+    .metric-box-green {
+      background-color: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 1rem;
+    }
+    .metric-box-cyan {
+      background-color: #ecfeff;
+      border: 1.5px solid #a5f3fc;
+      border-radius: 1rem;
+    }
+    /* 運動雙卡片 */
+    .sport-card-blue {
+      background-color: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 1rem;
+    }
+    .sport-card-green {
+      background-color: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 1rem;
+    }
+    /* 榮耀榜橫幅與白底小卡 */
+    .glory-banner {
+      background-color: #fdf2f8;
+      border: 1px solid #fce7f3;
+      border-radius: 0.75rem;
+      color: #be185d;
+    }
+    .honor-item {
+      background-color: #ffffff;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      border-radius: 0.75rem;
+    }
+    .number-display {
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+    }
+    @media print {
+      body { background: white !important; }
+      .no-print { display: none !important; }
+      .print-area { display: block !important; }
+    }
+  </style>
 </head>
-<body class="min-h-screen pb-16">
+<body class="p-3 sm:p-6 min-h-screen">
 
-<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-orange-400 flex items-center justify-center text-white font-black text-lg shadow-md shadow-rose-200">
-                CM
+  <div class="main-container">
+    
+    <!-- 頂部導航與功能按鈕 -->
+    <header class="flex justify-between items-center mb-4 px-1 no-print">
+      <div class="flex items-center space-x-2">
+        <span class="text-xl">🥗</span>
+        <span class="text-sm font-semibold text-slate-600">奇美醫院 營養科門診</span>
+      </div>
+      <div class="flex space-x-2">
+        <button onclick="openModal('reportModal')" class="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 rounded-full text-xs font-bold transition flex items-center shadow-sm">
+          📑 圖像化建議書
+        </button>
+        <button onclick="openModal('authorModal')" class="px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full text-xs font-bold transition flex items-center">
+          🔒 營養師後台
+        </button>
+      </div>
+    </header>
+
+    <!-- 主卡片 -->
+    <main class="card-base p-5 sm:p-7 space-y-6">
+
+      <!-- 標題區 -->
+      <section class="text-center space-y-1 pb-4 border-b border-slate-100">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">體重控制周計畫</h1>
+        <p class="text-xs sm:text-sm text-slate-500 font-medium">個人化飲食紀錄 ✕ 生理數據 ✕ 習慣養成追蹤</p>
+      </section>
+
+      <!-- 基本資料 -->
+      <section class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">個案姓名</label>
+            <input type="text" id="caseName" value="吳柚子" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">填寫日期</label>
+            <input type="date" id="recordDate" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">目標需求</label>
+            <select id="caseGoal" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs sm:text-sm font-semibold text-slate-700">
+              <option value="增肌減脂-減重" selected>增肌減脂-減重</option>
+              <option value="增肌維持健康">增肌維持健康</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">控制方式</label>
+            <select id="caseMethod" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs sm:text-sm font-semibold text-slate-700">
+              <option value="飲食控制" selected>飲食控制</option>
+              <option value="飲食+藥物控制">飲食+藥物控制</option>
+              <option value="無此需求">無此需求</option>
+            </select>
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-xs font-bold text-slate-600 mb-1">目前進度週次</label>
+            <select id="currentWeek" onchange="refreshView()" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs sm:text-sm font-semibold text-slate-700">
+              <option value="0">第 0 週 (基準開案)</option>
+              <option value="1">第 1 週</option>
+              <option value="2">第 2 週</option>
+              <option value="3" selected>第 3 週</option>
+              <option value="4">第 4 週</option>
+              <option value="8">第 8 週 (期中滿意度)</option>
+              <option value="12">第 12 週 (結案成果)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 營養師專屬分析報告 -->
+      <section class="space-y-4">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">💡</span>
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">營養師專屬分析報告</h2>
+            <p class="text-xs text-slate-500">習慣改變 ➔ 身體組成變化 正向因果回饋</p>
+          </div>
+        </div>
+
+        <!-- 累積努力成果卡片 -->
+        <div class="p-4 sm:p-5 bg-white border border-slate-100 rounded-2xl shadow-sm space-y-4">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-1.5">
+              <span class="text-base">🏆</span>
+              <span class="text-sm font-bold text-amber-900">累積努力成果與身體正向回饋</span>
             </div>
+            <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">與基準週相比</span>
+          </div>
+
+          <!-- 5 大成果指標方格 -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="metric-box-yellow p-3 text-center">
+              <p class="text-xs font-bold text-slate-600">體重增減</p>
+              <p class="text-xl sm:text-2xl font-black text-emerald-600 number-display mt-0.5">-0.6 kg</p>
+            </div>
+            <div class="metric-box-pink p-3 text-center">
+              <p class="text-xs font-bold text-slate-600">減輕百分比</p>
+              <p class="text-xl sm:text-2xl font-black text-rose-600 number-display mt-0.5">1.1%</p>
+            </div>
+            <div class="metric-box-yellow p-3 text-center">
+              <p class="text-xs font-bold text-slate-600">體脂肪量</p>
+              <p class="text-xl sm:text-2xl font-black text-emerald-600 number-display mt-0.5">-0.8 kg</p>
+            </div>
+            <div class="metric-box-green p-3 text-center">
+              <p class="text-xs font-bold text-slate-600">肌肉量</p>
+              <p class="text-xl sm:text-2xl font-black text-emerald-600 number-display mt-0.5">+0.2 kg</p>
+            </div>
+            <div class="metric-box-cyan col-span-2 p-3 text-center">
+              <p class="text-xs font-bold text-slate-600">內臟脂肪</p>
+              <p class="text-xl sm:text-2xl font-black text-emerald-600 number-display mt-0.5">-1.0 級</p>
+            </div>
+          </div>
+
+          <!-- 運動累計落實 -->
+          <div class="grid grid-cols-2 gap-3 pt-1">
+            <div class="sport-card-blue p-3 flex flex-col justify-between items-center text-center">
+              <p class="text-xs font-bold text-blue-900">🏃 有氧運動 150分/周</p>
+              <p class="text-lg sm:text-xl font-extrabold text-blue-600 number-display mt-1">2 / 3 週達標</p>
+            </div>
+            <div class="sport-card-green p-3 flex flex-col justify-between items-center text-center">
+              <p class="text-xs font-bold text-emerald-900">🏋️ 阻力運動 3次/周</p>
+              <p class="text-lg sm:text-xl font-extrabold text-emerald-600 number-display mt-1">2 / 3 週達標</p>
+            </div>
+          </div>
+
+          <!-- 正向回饋具體清單 -->
+          <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-100/60 space-y-2.5">
+            <p class="text-xs font-bold text-amber-800 flex items-center">
+              ✨ 覺察良好控制下的身體正向變化：
+            </p>
+            <ul class="text-xs sm:text-sm text-slate-700 space-y-2 leading-relaxed">
+              <li class="flex items-start">
+                <span class="text-emerald-500 mr-1.5 font-bold">●</span>
+                <span>落實<strong>【低油飲食過水漂洗 / 避免精製糖 / 提早晚餐】</strong>，體內胰島素趨於平穩，成功帶動體脂肪大幅降低 <strong>0.8 kg</strong>！</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-emerald-500 mr-1.5 font-bold">●</span>
+                <span>維持<strong>【充足睡眠 7 小時 / 提早睡覺】</strong>，促進瘦體素 (Leptin) 良好作用並壓制皮質醇，加速夜間燃脂！</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-emerald-500 mr-1.5 font-bold">●</span>
+                <span>藉由<strong>【有氧運動 150 分鐘與低油清淡飲食】</strong>，成功使深層內臟脂肪降低 <strong>1.0 級</strong>，顯著降低心血管代謝負擔！</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-emerald-500 mr-1.5 font-bold">●</span>
+                <span>落實<strong>【每日足夠水量 2500~3000ml】</strong>，有效帶動身體新陳代謝、利尿排除多餘水腫，累計體重減輕 <strong>0.6 kg</strong>！</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 榮耀榜橫幅 -->
+        <div class="glory-banner px-4 py-2.5 flex items-center space-x-1.5 font-bold text-xs sm:text-sm">
+          <span>🌟</span>
+          <span>榮耀榜！(完全達標 10分項目)</span>
+        </div>
+
+        <!-- 達標項目卡片清單 -->
+        <div class="space-y-2">
+          <div class="honor-item p-3 flex items-start space-x-3">
+            <span class="text-xl">💧</span>
             <div>
-                <h1 class="text-base sm:text-lg font-extrabold text-slate-800 tracking-tight leading-snug">
-                    奇美醫院 營養科門診
-                </h1>
-                <p class="text-xs text-slate-500 font-medium">體重控制周計畫 (3 個月 12 週完整版)</p>
+              <p class="text-xs sm:text-sm font-bold text-slate-800">足夠水量</p>
+              <p class="text-xs text-slate-600 mt-0.5">水分充足有效促進身體新陳代謝，加速假性飢餓代謝！</p>
             </div>
+          </div>
+          <div class="honor-item p-3 flex items-start space-x-3">
+            <span class="text-xl">🥩</span>
+            <div>
+              <p class="text-xs sm:text-sm font-bold text-slate-800">足夠蛋白質</p>
+              <p class="text-xs text-slate-600 mt-0.5">每餐蛋白質足量，為肌肉修復與燃脂提供頂級燃料！</p>
+            </div>
+          </div>
+          <div class="honor-item p-3 flex items-start space-x-3">
+            <span class="text-xl">🥗</span>
+            <div>
+              <p class="text-xs sm:text-sm font-bold text-slate-800">足夠蔬菜</p>
+              <p class="text-xs text-slate-600 mt-0.5">高膳食纖維完美包覆油脂，有效穩定血糖並維持腸道健康！</p>
+            </div>
+          </div>
+          <div class="honor-item p-3 flex items-start space-x-3">
+            <span class="text-xl">🌙</span>
+            <div>
+              <p class="text-xs sm:text-sm font-bold text-slate-800">減少晚進食</p>
+              <p class="text-xs text-slate-600 mt-0.5">晚上八點前完成晚餐，給予消化道充份休息與燃脂空檔！</p>
+            </div>
+          </div>
         </div>
 
-        <div class="flex items-center gap-2">
-            <button onclick="openVisualReportModal()" class="px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center gap-1.5 shadow-sm">
-                <span>📑</span> 圖像化建議書
-            </button>
-            <button onclick="toggleDietitianMode()" id="dietitianToggleBtn" class="px-3 py-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition flex items-center gap-1.5 shadow-sm">
-                <span>🔐</span> 營養師身分切換
-            </button>
+        <!-- 門診預約回診關懷卡 -->
+        <div class="bg-teal-50/60 p-4 rounded-2xl border border-teal-100 flex items-start space-x-3">
+          <span class="text-xl">👩‍⚕️</span>
+          <div class="text-xs sm:text-sm space-y-1">
+            <p class="font-bold text-teal-900">需要專屬個別化微調嗎？歡迎預約回診！</p>
+            <p class="text-slate-600 leading-relaxed">
+              體重與體脂的起伏是身體對環境與生活作息的生理適應訊號。若您在減重歷程遇到停滯期、外食選擇困難，建議預約回診與門診營養師面對面微調專屬計畫。
+            </p>
+            <p class="font-semibold text-teal-800 pt-0.5">
+              📞 奇美醫院營養門診專線：<a href="tel:0911561359" class="underline font-bold">0911-561-359</a> 或 (06)281-2811 分機 52522
+            </p>
+          </div>
         </div>
+
+      </section>
+
+      <!-- 送出按鈕 -->
+      <section class="pt-2 no-print">
+        <button onclick="mockSubmit()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-md transition text-sm sm:text-base flex justify-center items-center space-x-2">
+          <span>🚀 確認送出本周紀錄</span>
+        </button>
+      </section>
+
+    </main>
+
+    <footer class="text-center py-6 text-xs text-slate-400 no-print">
+      奇美醫療財團法人奇美醫院 營養科門診 ✕ 體重控制健康管理系統
+    </footer>
+
+  </div>
+
+  <!-- 圖像化建議書 Modal -->
+  <div id="reportModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 shadow-2xl">
+      
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800 text-base sm:text-lg flex items-center space-x-1.5">
+          <span>📑</span>
+          <span>個人圖像化進展總結與營養師建議書</span>
+        </h3>
+        <button onclick="closeModal('reportModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">✕</button>
+      </div>
+
+      <!-- 漸層諮詢處方名片卡 -->
+      <div class="prescription-card p-4 sm:p-5 space-y-2">
+        <div class="inline-block bg-rose-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+          個人諮詢處方
+        </div>
+        <h4 class="text-lg sm:text-xl font-black text-slate-800">
+          吳柚子 的 3 個月減重成效與生活型態總結
+        </h4>
+        <div class="text-xs text-slate-600 space-y-0.5 pt-1">
+          <p>填寫日期：2026-09-14 ｜ 目標需求：增肌減脂-減重</p>
+          <p>控制方式：飲食控制 ｜ 目標體重：45 kg ｜ 當前週次：第 3 週</p>
+          <p class="font-semibold text-slate-700 pt-1">奇美醫療財團法人奇美醫院 營養科門診</p>
+        </div>
+      </div>
+
+      <!-- 建議書 5 大指標 -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <div class="metric-box-yellow p-2.5 text-center">
+          <p class="text-[11px] font-bold text-slate-600">累積體重變化</p>
+          <p class="text-lg font-black text-emerald-600 number-display">-0.6 kg</p>
+        </div>
+        <div class="metric-box-pink p-2.5 text-center">
+          <p class="text-[11px] font-bold text-slate-600">減輕百分比</p>
+          <p class="text-lg font-black text-rose-600 number-display">1.1%</p>
+        </div>
+        <div class="metric-box-yellow p-2.5 text-center">
+          <p class="text-[11px] font-bold text-slate-600">累積體脂量</p>
+          <p class="text-lg font-black text-emerald-600 number-display">-0.8 kg</p>
+        </div>
+        <div class="metric-box-green p-2.5 text-center">
+          <p class="text-[11px] font-bold text-slate-600">累積肌肉量</p>
+          <p class="text-lg font-black text-emerald-600 number-display">+0.2 kg</p>
+        </div>
+        <div class="metric-box-cyan col-span-2 p-2.5 text-center">
+          <p class="text-[11px] font-bold text-slate-600">內臟脂肪變化</p>
+          <p class="text-lg font-black text-emerald-600 number-display">-1.0 級</p>
+        </div>
+      </div>
+
+      <!-- 具體生活處方 -->
+      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
+        <p class="font-bold text-slate-800 flex items-center">
+          <span class="mr-1">👩‍⚕️</span> 門診營養師個人化具體建議與生活處方：
+        </p>
+        <ul class="space-y-2 pl-1">
+          <li><strong>● 飲食與代謝基石：</strong>每日維持 2500~3000ml 水分，午晚餐落實外食過水去油，深綠色蔬菜攝取足 5 份以上（早1午2晚2），有效平穩胰島素與血糖。</li>
+          <li><strong>● 肌肉保護與燃脂引擎：</strong>每餐補足 3~4 份優質蛋白質，下午 3 點搭配無糖濃豆漿或乳清蛋白，並維持每週 3 次深蹲與死蟲式阻力訓練，守護基礎代謝率。</li>
+          <li><strong>● 晚進食與停滯期對策：</strong>盡量於晚間 8 點前完成進食；遇體重停滯時可諮詢營養師啟動 52 輕斷食或調整三大營養素比例。</li>
+        </ul>
+      </div>
+
+      <div class="flex space-x-2 pt-1 no-print">
+        <button onclick="window.print()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs sm:text-sm transition">
+          🖨️ 列印 / 另存為 PDF
+        </button>
+        <button onclick="closeModal('reportModal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs sm:text-sm transition">
+          關閉
+        </button>
+      </div>
+
     </div>
-</header>
+  </div>
 
-<main class="max-w-6xl mx-auto px-4 pt-6 space-y-6">
-
-    <section id="dietitianGroupSection" class="hidden glass-card rounded-3xl p-5 border-2 border-indigo-200 bg-gradient-to-br from-indigo-50/50 via-white to-purple-50/30 space-y-4 transition-all">
-        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-100 pb-3">
-            <div class="flex items-center gap-2">
-                <span class="text-xl">🩺</span>
-                <h2 class="text-sm font-bold text-indigo-950">
-                    全門診分組統計分析（純飲食控制組 vs 飲食+藥物控制組）
-                </h2>
-                <span class="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full">管理員即時看板</span>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="exportAllPatientsMasterCSV()" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                    <span>📊</span> 匯出全門診總表 (CSV)
-                </button>
-                <button onclick="showApiUrlSettingModal()" class="px-3 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-lg text-xs font-medium transition">
-                    ⚙️ 後端 API 設定
-                </button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- 飲食組 -->
-            <div class="bg-white rounded-2xl p-4 border border-emerald-100 shadow-sm space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg">🥗 純飲食控制組</span>
-                    <span id="dietGroupCount" class="text-xs font-medium text-slate-500">收案：0 人 (追蹤 0 人)</span>
-                </div>
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-slate-50 p-2 rounded-xl">
-                        <div class="text-[10px] text-slate-400 font-medium">平均減重</div>
-                        <div id="dietAvgWeight" class="text-sm font-extrabold text-slate-700">0.0 kg</div>
-                    </div>
-                    <div class="bg-slate-50 p-2 rounded-xl">
-                        <div class="text-[10px] text-slate-400 font-medium">平均減重%</div>
-                        <div id="dietAvgPct" class="text-sm font-extrabold text-emerald-600">0.0%</div>
-                    </div>
-                    <div class="bg-slate-50 p-2 rounded-xl">
-                        <div class="text-[10px] text-slate-400 font-medium">平均減脂</div>
-                        <div id="dietAvgFat" class="text-sm font-extrabold text-slate-700">0.0 kg</div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                    <div class="bg-slate-50 p-1.5 rounded-lg">
-                        <span class="text-[10px] text-slate-400 block">肌肉變化</span>
-                        <span id="dietAvgMuscle" class="font-bold text-slate-700">0.0 kg</span>
-                    </div>
-                    <div class="bg-slate-50 p-1.5 rounded-lg">
-                        <span class="text-[10px] text-slate-400 block">內臟脂肪變化</span>
-                        <span id="dietAvgVisceral" class="font-bold text-slate-700">0.0 級</span>
-                    </div>
-                    <div class="bg-slate-50 p-1.5 rounded-lg">
-                        <span class="text-[10px] text-slate-400 block">運動落實率</span>
-                        <span id="dietAvgExerciseRate" class="font-bold text-indigo-600">0%</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 藥物+飲食組 -->
-            <div class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-rose-800 bg-rose-50 px-2.5 py-1 rounded-lg">💊 飲食 + 藥物控制組</span>
-                    <span id="medGroupCount" class="text-xs font-medium text-slate-500">收案：0 人 (追蹤 0 人)</span>
-                </div>
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-slate-50 p-2 rounded-xl">
-                        <div class="text-[10px] text-slate-400 font-medium">平均減重</div>
-                        <div id="medAvgWeight" class="text-sm font-extrabold text-slate-700">0.0 kg</div>
-                    </div>
-                    <div class="bg-slate-50 p-2 rounded-xl">
-                        <div class="text-[10px] text-slate-400 font-medium">平均減重%</div>
-                        <div id="medAvgPct" class="text-sm font-extrabold text-rose-600">0.0%</div>
-                    </div>
-                    <div class="bg-slate-50 p-2 rounded-xl">
-                        <div class="text-[10px] text-slate-400 font-medium">平均減脂</div>
-                        <div id="medAvgFat" class="text-sm font-extrabold text-slate-700">0.0 kg</div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                    <div class="bg-slate-50 p-1.5 rounded-lg">
-                        <span class="text-[10px] text-slate-400 block">肌肉變化</span>
-                        <span id="medAvgMuscle" class="font-bold text-slate-700">0.0 kg</span>
-                    </div>
-                    <div class="bg-slate-50 p-1.5 rounded-lg">
-                        <span class="text-[10px] text-slate-400 block">內臟脂肪變化</span>
-                        <span id="medAvgVisceral" class="font-bold text-slate-700">0.0 級</span>
-                    </div>
-                    <div class="bg-slate-50 p-1.5 rounded-lg">
-                        <span class="text-[10px] text-slate-400 block">運動落實率</span>
-                        <span id="medAvgExerciseRate" class="font-bold text-indigo-600">0%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="glass-card rounded-3xl p-5 shadow-sm space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-            <div class="flex items-center gap-2">
-                <span class="text-xl">👤</span>
-                <h2 class="text-sm sm:text-base font-bold text-slate-800">個案基本資料與成果追蹤</h2>
-            </div>
-            <div class="flex items-center gap-2">
-                <select id="patientSelect" onchange="switchPatient(this.value)" class="text-xs bg-slate-100 border-none font-bold text-slate-700 rounded-xl px-3 py-1.5 outline-none focus:ring-2 focus:ring-rose-400">
-                    <!-- Populated dynamically -->
-                </select>
-                <button onclick="addNewPatientPrompt()" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold px-2.5 py-1.5 rounded-xl transition">
-                    + 新增個案
-                </button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-            <div>
-                <label class="text-[11px] font-bold text-slate-500 mb-1 block">個案姓名</label>
-                <input type="text" id="patientName" oninput="handlePatientNameInput(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-500 mb-1 block">填寫日期</label>
-                <input type="date" id="startDate" onchange="saveCurrentProfile()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-500 mb-1 block">個人目標需求</label>
-                <select id="patientDemand" onchange="saveCurrentProfile()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-                    <option value="增肌減脂-減重">增肌減脂 - 減重</option>
-                    <option value="增肌維持健康">增肌維持健康</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-500 mb-1 block">減重 / 控制方式</label>
-                <select id="weightLossMethod" onchange="saveCurrentProfile()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-                    <option value="飲食控制">飲食控制</option>
-                    <option value="飲食+藥物控制">飲食 + 藥物控制</option>
-                    <option value="無此需求">無此需求</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-[11px] font-bold text-slate-500 mb-1 block">目標體重 (kg)</label>
-                <input type="number" step="0.1" id="targetWeight" oninput="saveCurrentProfile()" placeholder="例: 58.0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-            </div>
-        </div>
-    </section>
-
-    <section class="space-y-2">
-        <div class="flex items-center justify-between px-1">
-            <span class="text-xs font-bold text-slate-600">📅 計畫執行週次 (點選切換檢視或填寫)</span>
-            <span id="currentWeekIndicator" class="text-xs font-extrabold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">第 1 周</span>
-        </div>
-        <div class="overflow-x-auto no-scrollbar py-1">
-            <div id="weekTabsContainer" class="flex gap-2 min-w-max">
-                <!-- Week tabs populated dynamically -->
-            </div>
-        </div>
-    </section>
-
-    <section class="glass-card rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <div class="flex items-center gap-2">
-                <span class="text-xl">🏆</span>
-                <h3 class="text-sm font-bold text-slate-800">累積努力成果與身體正向回饋（相較基準期）</h3>
-            </div>
-            <span class="text-[11px] text-slate-400 font-medium">每週晨間數值即時自動運算</span>
-        </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            <div class="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
-                <span class="text-[11px] text-slate-500 font-bold block mb-1">體重變化</span>
-                <span id="deltaWeight" class="text-base font-extrabold text-slate-800">持平</span>
-            </div>
-            <div class="bg-rose-50/60 p-3 rounded-2xl text-center border border-rose-100">
-                <span class="text-[11px] text-rose-700 font-bold block mb-1">減輕百分比 (%)</span>
-                <span id="deltaWeightPct" class="text-base font-extrabold text-rose-600">0.0%</span>
-            </div>
-            <div class="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
-                <span class="text-[11px] text-slate-500 font-bold block mb-1">體脂肪量變化</span>
-                <span id="deltaFat" class="text-base font-extrabold text-slate-800">持平</span>
-            </div>
-            <div class="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100">
-                <span class="text-[11px] text-slate-500 font-bold block mb-1">肌肉量變化</span>
-                <span id="deltaMuscle" class="text-base font-extrabold text-slate-800">持平</span>
-            </div>
-            <div class="bg-slate-50 p-3 rounded-2xl text-center border border-slate-100 col-span-2 sm:col-span-1">
-                <span class="text-[11px] text-slate-500 font-bold block mb-1">內臟脂肪變化</span>
-                <span id="deltaVisceral" class="text-base font-extrabold text-slate-800">持平</span>
-            </div>
-        </div>
-
-        <!-- 運動頻率 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            <div class="flex items-center justify-between p-3 bg-indigo-50/50 rounded-2xl border border-indigo-100 text-xs">
-                <div class="flex items-center gap-2">
-                    <span>🏃</span>
-                    <span class="font-bold text-slate-700">全期有氧運動落實</span>
-                </div>
-                <span id="aerobicFrequencyDisplay" class="font-extrabold text-indigo-700">0 週達成 (0%)</span>
-            </div>
-            <div class="flex items-center justify-between p-3 bg-purple-50/50 rounded-2xl border border-purple-100 text-xs">
-                <div class="flex items-center gap-2">
-                    <span>🏋️</span>
-                    <span class="font-bold text-slate-700">全期阻力運動落實</span>
-                </div>
-                <span id="resistanceFrequencyDisplay" class="font-extrabold text-purple-700">0 週達成 (0%)</span>
-            </div>
-        </div>
-
-        <!-- 中立客觀建議與回診提示 -->
-        <div id="neutralFeedbackContainer" class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200 text-xs text-amber-900 space-y-2">
-            <!-- Dynamically injected neutral objective feedback -->
-        </div>
-    </section>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- 晨間與醫院數據輸入 -->
-        <section class="lg:col-span-5 glass-card rounded-3xl p-5 shadow-sm space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">⚖️</span>
-                    <h3 class="text-sm font-bold text-slate-800">當週晨間與身體數據</h3>
-                </div>
-                <span id="metricWeekTitle" class="text-xs font-semibold text-slate-500">第 1 周記錄</span>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 mb-1 block">晨間空腹體重 (kg)</label>
-                    <input type="number" step="0.1" id="inputWeight" oninput="handleMetricChange('weight', this.value)" placeholder="例: 65.2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 mb-1 block">門診醫院體重 (kg)</label>
-                    <input type="number" step="0.1" id="inputHospitalWeight" oninput="handleMetricChange('hospitalWeight', this.value)" placeholder="例: 65.5" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 mb-1 block">體脂肪量 (kg)</label>
-                    <input type="number" step="0.1" id="inputFatMass" oninput="handleMetricChange('fatMass', this.value)" placeholder="例: 18.5" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 mb-1 block">體脂肪率 (%)</label>
-                    <input type="number" step="0.1" id="inputFatRate" oninput="handleMetricChange('fatRate', this.value)" placeholder="例: 28.3" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 mb-1 block">肌肉量 (kg)</label>
-                    <input type="number" step="0.1" id="inputMuscle" oninput="handleMetricChange('muscle', this.value)" placeholder="例: 43.1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-500 mb-1 block">內臟脂肪 (級)</label>
-                    <input type="number" step="0.5" id="inputVisceralFat" oninput="handleMetricChange('visceralFat', this.value)" placeholder="例: 5.0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
-                </div>
-            </div>
-
-            <!-- 當週趨勢小圖 -->
-            <div class="pt-2">
-                <span class="text-[11px] font-bold text-slate-500 mb-2 block">📊 體重與體脂率歷程曲線</span>
-                <div class="h-44 w-full bg-white rounded-2xl p-2 border border-slate-100">
-                    <canvas id="metricsChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <!-- 11 項生活飲食目標落實評分 -->
-        <section class="lg:col-span-7 glass-card rounded-3xl p-5 shadow-sm space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">🥗</span>
-                    <h3 class="text-sm font-bold text-slate-800">11 項生活習慣與飲食目標落實</h3>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-slate-500">當週總分:</span>
-                    <span id="currentWeekScore" class="text-sm font-black text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-lg">0 / 110 分</span>
-                </div>
-            </div>
-
-            <div id="goalsContainer" class="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
-                <!-- Populated dynamically -->
-            </div>
-        </section>
+  <!-- 後台 Modal 簡版 -->
+  <div id="authorModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-slate-800 text-base">🔒 營養師後台管理認證</h3>
+        <button onclick="closeModal('authorModal')" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+      </div>
+      <p class="text-xs text-slate-500">請輸入營養門診專屬管理密碼以查看純飲食組與藥物組統計看板：</p>
+      <input type="password" id="adminPwd" placeholder="請輸入密碼 (預設: chimei888)" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+      <div class="flex space-x-2 pt-2">
+        <button onclick="alert('登入成功！已解鎖作者分組統計儀表板與全門診數據。')" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 rounded-xl text-xs transition">確認登入</button>
+        <button onclick="closeModal('authorModal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2 rounded-xl text-xs transition">取消</button>
+      </div>
     </div>
+  </div>
 
-    <section class="glass-card rounded-3xl p-5 shadow-sm flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg">
-                ☁️
-            </div>
-            <div>
-                <h4 class="text-xs font-bold text-slate-800">雲端試算表自動連動</h4>
-                <p class="text-[11px] text-slate-500">點擊送出即可同步至奇美醫院後端 Google 試算表三大頁籤</p>
-            </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
-            <button onclick="exportCurrentPatientCSV()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
-                <span>📥</span> 匯出個人歷程 (CSV)
-            </button>
-            <button onclick="submitToGoogleSheet()" id="syncSheetBtn" class="px-6 py-2.5 bg-gradient-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-white rounded-xl text-xs font-extrabold shadow-md shadow-rose-200 transition flex items-center gap-2">
-                <span>🚀</span> 確認送出本周紀錄
-            </button>
-        </div>
-    </section>
-
-</main>
-
-<div id="visualReportModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-5">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3 no-print">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">📑</span>
-                <h3 class="text-base font-extrabold text-slate-800">個案進展總結與營養師專業建議書</h3>
-            </div>
-            <button onclick="closeVisualReportModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
-        </div>
-
-        <div id="printableReport" class="space-y-4">
-            <!-- Header -->
-            <div class="border-b-2 border-rose-100 pb-3 text-center sm:text-left flex flex-wrap justify-between items-end gap-2">
-                <div>
-                    <h2 class="text-lg font-black text-rose-950">奇美醫療財團法人奇美醫院 營養科門診</h2>
-                    <p class="text-xs text-slate-500">體重控制周計畫 - 個人化全期健康建議書</p>
-                </div>
-                <div class="text-right text-xs text-slate-400">
-                    產生日期：<span id="reportGenDate"></span>
-                </div>
-            </div>
-
-            <!-- Profile Summary -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50 p-3 rounded-2xl text-xs">
-                <div><span class="text-slate-400 block text-[10px]">個案姓名</span><strong id="repName" class="text-slate-800 text-sm">-</strong></div>
-                <div><span class="text-slate-400 block text-[10px]">目標需求</span><strong id="repDemand" class="text-slate-800">-</strong></div>
-                <div><span class="text-slate-400 block text-[10px]">控制方式</span><strong id="repMethod" class="text-slate-800">-</strong></div>
-                <div><span class="text-slate-400 block text-[10px]">最新進度</span><strong id="repWeek" class="text-rose-600">-</strong></div>
-            </div>
-
-            <!-- 5 Metrics Cards -->
-            <div class="space-y-1">
-                <h4 class="text-xs font-bold text-slate-700">📌 身體組成全期變化總結（相較基準期）</h4>
-                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
-                    <div class="p-2.5 rounded-xl bg-slate-100 text-xs">
-                        <span class="text-[10px] text-slate-400 block">累積體重變化</span>
-                        <strong id="repWeight" class="text-sm text-slate-800">-</strong>
-                    </div>
-                    <div class="p-2.5 rounded-xl bg-rose-50 text-xs">
-                        <span class="text-[10px] text-rose-600 block">減輕百分比 (%)</span>
-                        <strong id="repWeightPct" class="text-sm text-rose-600">-</strong>
-                    </div>
-                    <div class="p-2.5 rounded-xl bg-slate-100 text-xs">
-                        <span class="text-[10px] text-slate-400 block">體脂肪量變化</span>
-                        <strong id="repFat" class="text-sm text-slate-800">-</strong>
-                    </div>
-                    <div class="p-2.5 rounded-xl bg-slate-100 text-xs">
-                        <span class="text-[10px] text-slate-400 block">肌肉量變化</span>
-                        <strong id="repMuscle" class="text-sm text-slate-800">-</strong>
-                    </div>
-                    <div class="p-2.5 rounded-xl bg-slate-100 text-xs col-span-2 sm:col-span-1">
-                        <span class="text-[10px] text-slate-400 block">內臟脂肪變化</span>
-                        <strong id="repVisceral" class="text-sm text-slate-800">-</strong>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Exercise Summary -->
-            <div class="p-3 bg-indigo-50/60 rounded-2xl border border-indigo-100 flex flex-wrap justify-between gap-2 text-xs">
-                <div>🏃 <strong>有氧運動（150分/周）：</strong><span id="repAerobic">-</span></div>
-                <div>🏋️ <strong>阻力運動（3次/周）：</strong><span id="repResistance">-</span></div>
-            </div>
-
-            <!-- Objective Feedback -->
-            <div class="space-y-1">
-                <h4 class="text-xs font-bold text-slate-700">💡 營養師客觀解說與生理機制探索（O-A-E-A 模型）</h4>
-                <div id="repFeedbackContent" class="p-4 bg-amber-50/80 rounded-2xl border border-amber-200 text-xs text-amber-950 space-y-2 leading-relaxed">
-                    <!-- Injected -->
-                </div>
-            </div>
-
-            <!-- Clinical Contact Banner -->
-            <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 flex flex-wrap items-center justify-between gap-2 text-xs text-emerald-900">
-                <div class="flex items-center gap-2">
-                    <span class="text-base">🏥</span>
-                    <span><strong>奇美醫院營養門診關心您：</strong>若數值波動或遇停滯期，請隨時預約門診與營養師討論調整。</span>
-                </div>
-                <div class="font-bold text-emerald-700">諮詢專線：0911-561-359 / 06-2812811 #52522</div>
-            </div>
-        </div>
-
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 no-print">
-            <button onclick="closeVisualReportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">關閉</button>
-            <button onclick="window.print()" class="px-5 py-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-xl text-xs font-bold shadow transition flex items-center gap-1.5">
-                <span>🖨️</span> 列印 / 存為 PDF
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="customModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="glass-card bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
-        <div id="modalIcon" class="text-4xl">💡</div>
-        <h3 id="modalTitle" class="text-base font-bold text-slate-800">提示</h3>
-        <p id="modalMessage" class="text-xs text-slate-600 leading-relaxed"></p>
-        <div id="modalInputContainer" class="hidden">
-            <input type="text" id="modalInput" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center text-xs font-bold outline-none focus:ring-2 focus:ring-rose-400">
-        </div>
-        <div class="flex gap-2 pt-2 justify-center">
-            <button id="modalCancelBtn" onclick="closeCustomModal()" class="hidden px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">取消</button>
-            <button id="modalConfirmBtn" onclick="closeCustomModal()" class="px-6 py-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-xl text-xs font-bold shadow transition">確認</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzt_ZpwlB2wXa4nWKi8SZ-7bih8v8O8ERCQZhovGJa32skcgq3jNkHyoeI4jxdu5LIT/exec";
-    const DIETITIAN_PASSWORD = "chimei888";
-
-    const GOAL_DEFINITIONS = [
-        { id: 'water', title: '1. 足夠水量 (2500~3000ml)', desc: '促進新陳代謝與脂肪分解' },
-        { id: 'protein', title: '2. 足夠蛋白質 (12~16份)', desc: '維持肌肉量與食物生熱效應' },
-        { id: 'vegetables', title: '3. 足夠蔬菜 (>5份,早1午2晚2)', desc: '富含膳食纖維與維持腸道菌相' },
-        { id: 'proteinSnack', title: '4. 下午3點高蛋白點心', desc: '避免晚餐飢餓感失控' },
-        { id: 'lowOil', title: '5. 低油飲食 (漂洗去油)', desc: '去除外食隱形油脂' },
-        { id: 'avoidSugar', title: '6. 避免精製糖', desc: '避免胰島素震盪堆積脂肪' },
-        { id: 'earlyDinner', title: '7. 減少晚進食 (晚上8點前)', desc: '給予消化道充裕夜間空腹修復期' },
-        { id: 'fasting52', title: '8. 平原期 (52輕斷食)', desc: '突破代謝停滯期 (無平原期可選完成)' },
-        { id: 'sleep7h', title: '9. 每日睡眠至少7小時', desc: '調節瘦體素與皮質醇濃度' },
-        { id: 'aerobic150m', title: '10. 有氧運動150分/周', desc: '快走、慢跑、單車燃燒深層脂肪' },
-        { id: 'resistance3x', title: '11. 阻力運動3次/周', desc: '深蹲、彈力帶強化骨骼肌代謝' }
-    ];
-
-    // Main in-memory state
-    let state = {
-        isDietitian: false,
-        activePatientId: "default",
-        currentWeek: 1,
-        patients: {},
-        apiUrl: DEFAULT_APPS_SCRIPT_URL
-    };
-
-    let metricsChartInstance = null;
-
-    // Helper modal without alert/confirm
-    let modalCallback = null;
-    function showCustomModal({ icon = '💡', title = '提示', message = '', hasInput = false, inputPlaceholder = '', inputType = 'text', showCancel = false, onConfirm = null }) {
-        const modal = document.getElementById('customModal');
-        document.getElementById('modalIcon').textContent = icon;
-        document.getElementById('modalTitle').textContent = title;
-        document.getElementById('modalMessage').textContent = message;
-
-        const inputContainer = document.getElementById('modalInputContainer');
-        const input = document.getElementById('modalInput');
-        if (hasInput) {
-            inputContainer.classList.remove('hidden');
-            input.value = '';
-            input.type = inputType;
-            input.placeholder = inputPlaceholder;
-            setTimeout(() => input.focus(), 100);
-        } else {
-            inputContainer.classList.add('hidden');
-        }
-
-        const cancelBtn = document.getElementById('modalCancelBtn');
-        if (showCancel) {
-            cancelBtn.classList.remove('hidden');
-        } else {
-            cancelBtn.classList.add('hidden');
-        }
-
-        modalCallback = onConfirm;
-        modal.classList.remove('hidden');
+  <script>
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
     }
-
-    function closeCustomModal() {
-        const modal = document.getElementById('customModal');
-        const input = document.getElementById('modalInput');
-        const val = input.value;
-        modal.classList.add('hidden');
-        if (modalCallback) {
-            const cb = modalCallback;
-            modalCallback = null;
-            cb(val);
-        }
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
     }
-
-    function initDatabase() {
-        try {
-            const stored = localStorage.getItem('chimei_diet_v1');
-            if (stored) {
-                const parsed = JSON.parse(stored);
-                state.patients = parsed.patients || {};
-                // 強制採用最新正式發布的 Apps Script 網址，清除舊快取
-                state.apiUrl = DEFAULT_APPS_SCRIPT_URL;
-                state.activePatientId = parsed.lastActivePatient || Object.keys(state.patients)[0] || "default";
-            }
-        } catch (e) {
-            console.error("Local storage read error:", e);
-        }
-
-        // Initialize default sample patient if empty
-        if (!state.patients || Object.keys(state.patients).length === 0) {
-            state.patients = {
-                "p_sample": {
-                    id: "p_sample",
-                    name: "陳小美",
-                    startDate: new Date().toISOString().split('T')[0],
-                    demand: "增肌減脂-減重",
-                    weightLossMethod: "飲食控制",
-                    targetWeight: 56.0,
-                    weeksData: createBlankWeeksData()
-                }
-            };
-            state.activePatientId = "p_sample";
-        }
-
-        if (!state.patients[state.activePatientId]) {
-            state.activePatientId = Object.keys(state.patients)[0];
-        }
-
-        saveToLocalStorage();
+    function refreshView() {
+      // 模擬切換週次
     }
-
-    function createBlankWeeksData() {
-        const weeks = {};
-        for (let i = 0; i <= 12; i++) {
-            weeks[i] = {
-                metrics: { weight: null, hospitalWeight: null, fatMass: null, fatRate: null, muscle: null, visceralFat: null },
-                goals: {
-                    water: 'mid', protein: 'mid', vegetables: 'mid', proteinSnack: 'mid',
-                    lowOil: 'mid', avoidSugar: 'mid', earlyDinner: 'mid', fasting52: 'mid',
-                    sleep7h: 'mid', aerobic150m: 'low', resistance3x: 'low'
-                }
-            };
-        }
-        return weeks;
+    function mockSubmit() {
+      alert('模擬送出成功！資料將透過最新 Google Apps Script Web App 同步寫入您的 Google 試算表。');
     }
-
-    function saveToLocalStorage() {
-        try {
-            localStorage.setItem('chimei_diet_v1', JSON.stringify({
-                patients: state.patients,
-                lastActivePatient: state.activePatientId,
-                apiUrl: state.apiUrl
-            }));
-        } catch (e) {
-            console.error("Local storage save error:", e);
-        }
-    }
-
-    function renderPatientSelect() {
-        const select = document.getElementById('patientSelect');
-        select.innerHTML = '';
-        Object.values(state.patients).forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.id;
-            opt.textContent = p.name || '未填寫姓名';
-            if (p.id === state.activePatientId) opt.selected = true;
-            select.appendChild(opt);
-        });
-    }
-
-    function loadActivePatientProfile() {
-        const patient = state.patients[state.activePatientId];
-        if (!patient) return;
-
-        document.getElementById('patientName').value = patient.name || '';
-        document.getElementById('startDate').value = patient.startDate || '';
-        document.getElementById('patientDemand').value = patient.demand || '增肌減脂-減重';
-        document.getElementById('weightLossMethod').value = patient.weightLossMethod || '飲食控制';
-        document.getElementById('targetWeight').value = patient.targetWeight || '';
-
-        renderWeekTabs();
-        loadCurrentWeekData();
-        updateProgressMilestone();
-        updateChart();
-        if (state.isDietitian) calculateAndRenderDietitianGroupStats();
-    }
-
-    function handlePatientNameInput(name) {
-        const currentP = state.patients[state.activePatientId];
-        if (currentP) {
-            currentP.name = name;
-            saveToLocalStorage();
-            renderPatientSelect();
-        }
-    }
-
-    function saveCurrentProfile() {
-        const patient = state.patients[state.activePatientId];
-        if (!patient) return;
-
-        patient.startDate = document.getElementById('startDate').value;
-        patient.demand = document.getElementById('patientDemand').value;
-        patient.weightLossMethod = document.getElementById('weightLossMethod').value;
-        patient.targetWeight = parseFloat(document.getElementById('targetWeight').value) || null;
-
-        saveToLocalStorage();
-        if (state.isDietitian) calculateAndRenderDietitianGroupStats();
-    }
-
-    function addNewPatientPrompt() {
-        showCustomModal({
-            icon: '👤',
-            title: '新增個案',
-            message: '請輸入新個案的姓名：',
-            hasInput: true,
-            inputPlaceholder: '例: 王小明',
-            showCancel: true,
-            onConfirm: (name) => {
-                const trimmed = (name || '').trim();
-                if (!trimmed) return;
-                const newId = 'p_' + Date.now();
-                state.patients[newId] = {
-                    id: newId,
-                    name: trimmed,
-                    startDate: new Date().toISOString().split('T')[0],
-                    demand: "增肌減脂-減重",
-                    weightLossMethod: "飲食控制",
-                    targetWeight: null,
-                    weeksData: createBlankWeeksData()
-                };
-                state.activePatientId = newId;
-                saveToLocalStorage();
-                renderPatientSelect();
-                loadActivePatientProfile();
-            }
-        });
-    }
-
-    function switchPatient(patientId) {
-        if (!state.patients[patientId]) return;
-        state.activePatientId = patientId;
-        saveToLocalStorage();
-        loadActivePatientProfile();
-    }
-
-    function renderWeekTabs() {
-        const container = document.getElementById('weekTabsContainer');
-        container.innerHTML = '';
-
-        for (let i = 0; i <= 12; i++) {
-            const btn = document.createElement('button');
-            const isActive = (state.currentWeek === i);
-            btn.className = `px-3.5 py-1.5 rounded-2xl text-xs font-bold transition flex items-center gap-1 shrink-0 ${
-                isActive 
-                    ? 'bg-rose-500 text-white shadow-md shadow-rose-200' 
-                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-            }`;
-
-            const label = (i === 0) ? '基準期' : `第 ${i} 周`;
-            btn.innerHTML = `<span>${label}</span>`;
-            if (i === 8 || i === 12) {
-                btn.innerHTML += `<span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-emerald-500'}"></span>`;
-            }
-
-            btn.onclick = () => selectWeek(i);
-            container.appendChild(btn);
-        }
-
-        const indicator = document.getElementById('currentWeekIndicator');
-        const metricTitle = document.getElementById('metricWeekTitle');
-        const weekName = (state.currentWeek === 0) ? '執行前 (基準期)' : `第 ${state.currentWeek} 周`;
-        indicator.textContent = weekName;
-        metricTitle.textContent = `${weekName}記錄`;
-    }
-
-    function selectWeek(weekNum) {
-        state.currentWeek = weekNum;
-        renderWeekTabs();
-        loadCurrentWeekData();
-    }
-
-    function loadCurrentWeekData() {
-        const patient = state.patients[state.activePatientId];
-        if (!patient) return;
-
-        const wData = patient.weeksData[state.currentWeek] || { metrics: {}, goals: {} };
-        const m = wData.metrics || {};
-        const g = wData.goals || {};
-
-        document.getElementById('inputWeight').value = m.weight !== null ? m.weight : '';
-        document.getElementById('inputHospitalWeight').value = m.hospitalWeight !== null ? m.hospitalWeight : '';
-        document.getElementById('inputFatMass').value = m.fatMass !== null ? m.fatMass : '';
-        document.getElementById('inputFatRate').value = m.fatRate !== null ? m.fatRate : '';
-        document.getElementById('inputMuscle').value = m.muscle !== null ? m.muscle : '';
-        document.getElementById('inputVisceralFat').value = m.visceralFat !== null ? m.visceralFat : '';
-
-        renderGoals(g);
-        calculateCurrentWeekScore();
-    }
-
-    function handleMetricChange(key, value) {
-        const patient = state.patients[state.activePatientId];
-        if (!patient) return;
-
-        const val = value === '' ? null : parseFloat(value);
-        patient.weeksData[state.currentWeek].metrics[key] = isNaN(val) ? null : val;
-
-        saveToLocalStorage();
-        updateProgressMilestone();
-        updateChart();
-        if (state.isDietitian) calculateAndRenderDietitianGroupStats();
-    }
-
-    function renderGoals(goals) {
-        const container = document.getElementById('goalsContainer');
-        container.innerHTML = '';
-
-        GOAL_DEFINITIONS.forEach(def => {
-            const currentVal = goals[def.id] || 'mid';
-            const row = document.createElement('div');
-            row.className = 'p-3 bg-white rounded-2xl border border-slate-100 flex flex-wrap items-center justify-between gap-2 shadow-xs';
-
-            row.innerHTML = `
-                <div>
-                    <h5 class="text-xs font-bold text-slate-800">${def.title}</h5>
-                    <p class="text-[10px] text-slate-400 font-medium">${def.desc}</p>
-                </div>
-                <div class="flex gap-1">
-                    <button type="button" onclick="setGoalScore('${def.id}', 'done')" class="px-2.5 py-1 rounded-xl text-[11px] font-bold transition ${currentVal === 'done' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}">
-                        完成 (10分)
-                    </button>
-                    <button type="button" onclick="setGoalScore('${def.id}', 'mid')" class="px-2.5 py-1 rounded-xl text-[11px] font-bold transition ${currentVal === 'mid' ? 'bg-amber-500 text-white shadow-xs' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'}">
-                        3~5天 (5分)
-                    </button>
-                    <button type="button" onclick="setGoalScore('${def.id}', 'low')" class="px-2.5 py-1 rounded-xl text-[11px] font-bold transition ${currentVal === 'low' ? 'bg-slate-400 text-white shadow-xs' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}">
-                        &lt;3天 (0分)
-                    </button>
-                </div>
-            `;
-            container.appendChild(row);
-        });
-    }
-
-    function setGoalScore(goalId, val) {
-        const patient = state.patients[state.activePatientId];
-        if (!patient) return;
-
-        patient.weeksData[state.currentWeek].goals[goalId] = val;
-        saveToLocalStorage();
-        loadCurrentWeekData();
-        updateProgressMilestone();
-        if (state.isDietitian) calculateAndRenderDietitianGroupStats();
-    }
-
-    function calculateCurrentWeekScore() {
-        const patient = state.patients[state.activePatientId];
-        if (!patient) return;
-
-        const g = patient.weeksData[state.currentWeek].goals || {};
-        let score = 0;
-        Object.values(g).forEach(val => {
-            if (val === 'done') score += 10;
-            else if (val === 'mid') score += 5;
-        });
-
-        document.getElementById('currentWeekScore').textContent = `${score} / 110 分`;
-    }
-
-    function updateProgressMilestone() {
-        const patient = state.patients[state.activePatientId];
-        if (!patient) return;
-
-        const base = patient.weeksData[0]?.metrics || {};
-        const cur = patient.weeksData[state.currentWeek]?.metrics || {};
-
-        const dWEl = document.getElementById('deltaWeight');
-        const dWPctEl = document.getElementById('deltaWeightPct');
-        const dFEl = document.getElementById('deltaFat');
-        const dMEl = document.getElementById('deltaMuscle');
-        const dVEl = document.getElementById('deltaVisceral');
-
-        let dW = null, dWPct = null, dF = null, dM = null, dV = null;
-
-        if (base.weight !== null && cur.weight !== null) {
-            dW = cur.weight - base.weight;
-            dWPct = base.weight > 0 ? (Math.abs(dW) / base.weight) * 100 : 0;
-            formatDeltaBadge(dWEl, dW, 'kg', true);
-            dWPctEl.textContent = `${dWPct.toFixed(1)}%`;
-            dWPctEl.className = dW <= 0 ? "text-base font-extrabold text-emerald-600" : "text-base font-extrabold text-rose-600";
-        } else {
-            dWEl.textContent = "持平";
-            dWPctEl.textContent = "0.0%";
-        }
-
-        if (base.fatMass !== null && cur.fatMass !== null) {
-            dF = cur.fatMass - base.fatMass;
-            formatDeltaBadge(dFEl, dF, 'kg', true);
-        } else {
-            dFEl.textContent = "持平";
-        }
-
-        if (base.muscle !== null && cur.muscle !== null) {
-            dM = cur.muscle - base.muscle;
-            formatDeltaBadge(dMEl, dM, 'kg', false);
-        } else {
-            dMEl.textContent = "持平";
-        }
-
-        if (base.visceralFat !== null && cur.visceralFat !== null) {
-            dV = cur.visceralFat - base.visceralFat;
-            formatDeltaBadge(dVEl, dV, '級', true);
-        } else {
-            dVEl.textContent = "持平";
-        }
-
-        let aeroWeeks = 0, resWeeks = 0, recordedWeeks = 0;
-        for (let i = 1; i <= 12; i++) {
-            const w = patient.weeksData[i];
-            if (w && (w.metrics.weight !== null || Object.values(w.goals).some(v => v !== 'mid'))) {
-                recordedWeeks++;
-                if (w.goals.aerobic150m === 'done' || w.goals.aerobic150m === 'mid') aeroWeeks++;
-                if (w.goals.resistance3x === 'done' || w.goals.resistance3x === 'mid') resWeeks++;
-            }
-        }
-
-        const aeroPct = recordedWeeks > 0 ? Math.round((aeroWeeks / recordedWeeks) * 100) : 0;
-        const resPct = recordedWeeks > 0 ? Math.round((resWeeks / recordedWeeks) * 100) : 0;
-
-        document.getElementById('aerobicFrequencyDisplay').textContent = `${aeroWeeks} 週達標 (${aeroPct}%)`;
-        document.getElementById('resistanceFrequencyDisplay').textContent = `${resWeeks} 週達標 (${resPct}%)`;
-
-        renderNeutralFeedback({ dW, dF, dM, dV, aeroPct, resPct });
-    }
-
-    function formatDeltaBadge(el, val, unit, isLowerBetter) {
-        if (val === null || Math.abs(val) < 0.05) {
-            el.textContent = "持平";
-            el.className = "text-base font-extrabold text-slate-700";
-            return;
-        }
-
-        const sign = val > 0 ? `+${val.toFixed(1)}` : val.toFixed(1);
-        el.textContent = `${sign} ${unit}`;
-
-        if (isLowerBetter) {
-            el.className = val < 0 ? "text-base font-extrabold text-emerald-600" : "text-base font-extrabold text-rose-600";
-        } else {
-            el.className = val > 0 ? "text-base font-extrabold text-emerald-600" : "text-base font-extrabold text-amber-600";
-        }
-    }
-
-    function renderNeutralFeedback({ dW, dF, dM, dV, aeroPct, resPct }) {
-        const container = document.getElementById('neutralFeedbackContainer');
-        let html = '';
-
-        if (dF !== null && dF > 0.3) {
-            html += `
-                <div class="border-l-2 border-amber-400 pl-3">
-                    <strong class="font-bold">【🔍 身體能量儲存模式探索】</strong>
-                    <p class="mt-0.5 leading-relaxed">
-                        數據顯示體脂肪量有微幅波動 (+${dF.toFixed(1)} kg)。減重期間身體面對作息微調或偶發社交時，這是很自然的生理適應信號，請無需自責。
-                        外食料理中常有較多隱形油脂或高糖醬汁刺激胰島素暫時儲存能量。
-                        <strong>建議微調：</strong>三餐主菜多去皮、蔬菜熱水漂洗去油，或在下午 3 點補充無糖濃豆漿，阻斷晚間飢餓感。
-                    </p>
-                </div>
-            `;
-        }
-
-        if (dV !== null && dV > 0.5) {
-            html += `
-                <div class="border-l-2 border-rose-400 pl-3">
-                    <strong class="font-bold">【🩺 深層代謝指針客觀回饋】</strong>
-                    <p class="mt-0.5 leading-relaxed">
-                        深層代謝指標出現起伏 (+${dV.toFixed(1)} 級)。內臟脂肪對「晚間進食時間」與「壓力/睡眠不足 (皮質醇分泌)」極為敏感。
-                        <strong>建議微調：</strong>盡量於晚間 8 點前完成用餐，睡前 30 分鐘減少藍光刺激，給予消化道充裕夜間空腹修復期。
-                    </p>
-                </div>
-            `;
-        }
-
-        if (dM !== null && dM < -0.3) {
-            html += `
-                <div class="border-l-2 border-indigo-400 pl-3">
-                    <strong class="font-bold">【💪 骨骼肌代謝引擎穩固】</strong>
-                    <p class="mt-0.5 leading-relaxed">
-                        偵測到肌肉量有微幅調整 (${dM.toFixed(1)} kg)，通常與體內水分起伏或蛋白質分配不均有關。
-                        <strong>建議微調：</strong>早餐補足一顆蛋或無糖豆漿，並維持每週 3 次居家深蹲或橋式，穩固人體最高效的燃脂引擎。
-                    </p>
-                </div>
-            `;
-        }
-
-        if (!html) {
-            html = `
-                <div class="flex items-center gap-2">
-                    <span class="text-base">✨</span>
-                    <span>整體生理節律維持良好！持續落實優質蛋白質與規律飲水，身體將持續朝健康平衡目標邁進。</span>
-                </div>
-            `;
-        }
-
-        html += `
-            <div class="pt-2 border-t border-amber-200/60 flex flex-wrap items-center justify-between gap-1 text-[11px] text-amber-800">
-                <span>💬 <strong>溫馨提示：</strong>若對數值波動有任何疑慮或遇代謝停滯期，歡迎預約回診與門診營養師面對面微調。</span>
-                <span class="font-bold">門診專線：0911-561-359</span>
-            </div>
-        `;
-
-        container.innerHTML = html;
-    }
-
-    function updateChart() {
-        const patient = state.patients[state.activePatientId];
-        if (!patient) return;
-
-        const labels = [];
-        const weights = [];
-        const fatRates = [];
-        const muscles = [];
-
-        for (let i = 0; i <= 12; i++) {
-            labels.push(i === 0 ? '基準' : `W${i}`);
-            const m = patient.weeksData[i]?.metrics || {};
-            weights.push(m.weight !== null ? m.weight : null);
-            fatRates.push(m.fatRate !== null ? m.fatRate : null);
-            muscles.push(m.muscle !== null ? m.muscle : null);
-        }
-
-        const ctx = document.getElementById('metricsChart').getContext('2d');
-        if (metricsChartInstance) {
-            metricsChartInstance.destroy();
-        }
-
-        metricsChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: '體重 (kg)',
-                        data: weights,
-                        borderColor: '#F43F5E',
-                        backgroundColor: 'rgba(244, 63, 94, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        spanGaps: true
-                    },
-                    {
-                        label: '體脂率 (%)',
-                        data: fatRates,
-                        borderColor: '#F59E0B',
-                        backgroundColor: 'transparent',
-                        borderWidth: 2,
-                        borderDash: [4, 4],
-                        tension: 0.3,
-                        spanGaps: true
-                    },
-                    {
-                        label: '肌肉量 (kg)',
-                        data: muscles,
-                        borderColor: '#6366F1',
-                        backgroundColor: 'transparent',
-                        borderWidth: 1.5,
-                        tension: 0.3,
-                        spanGaps: true
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } }
-                    }
-                },
-                scales: {
-                    y: {
-                        ticks: { font: { size: 9 } },
-                        grid: { color: '#F1F5F9' }
-                    },
-                    x: {
-                        ticks: { font: { size: 9 } },
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-    }
-
-    function calculateAndRenderDietitianGroupStats() {
-        const patients = Object.values(state.patients);
-        const dietStats = { count: 0, tracked: 0, dW: 0, dPct: 0, dF: 0, dM: 0, dV: 0, aero: 0, totalW: 0 };
-        const medStats  = { count: 0, tracked: 0, dW: 0, dPct: 0, dF: 0, dM: 0, dV: 0, aero: 0, totalW: 0 };
-
-        patients.forEach(p => {
-            const isMed = (p.weightLossMethod || '').includes('藥物');
-            const grp = isMed ? medStats : dietStats;
-            grp.count++;
-
-            const base = p.weeksData[0]?.metrics || {};
-            let latest = null;
-            for (let i = 12; i >= 1; i--) {
-                const m = p.weeksData[i]?.metrics;
-                if (m && m.weight !== null) {
-                    latest = m;
-                    break;
-                }
-            }
-
-            if (base.weight !== null && latest && latest.weight !== null) {
-                grp.tracked++;
-                const diffW = latest.weight - base.weight;
-                grp.dW += diffW;
-                grp.dPct += (base.weight > 0 ? (Math.abs(diffW) / base.weight) * 100 : 0);
-
-                if (base.fatMass !== null && latest.fatMass !== null) grp.dF += (latest.fatMass - base.fatMass);
-                if (base.muscle !== null && latest.muscle !== null) grp.dM += (latest.muscle - base.muscle);
-                if (base.visceralFat !== null && latest.visceralFat !== null) grp.dV += (latest.visceralFat - base.visceralFat);
-            }
-
-            for (let i = 1; i <= 12; i++) {
-                const w = p.weeksData[i];
-                if (w && (w.metrics.weight !== null || Object.values(w.goals).some(v => v !== 'mid'))) {
-                    grp.totalW++;
-                    if (w.goals.aerobic150m === 'done' || w.goals.aerobic150m === 'mid') grp.aero++;
-                }
-            }
-        });
-
-        // Update Diet DOM
-        document.getElementById('dietGroupCount').textContent = `收案：${dietStats.count} 人 (追蹤 ${dietStats.tracked} 人)`;
-        document.getElementById('dietAvgWeight').textContent = dietStats.tracked > 0 ? `${(dietStats.dW / dietStats.tracked).toFixed(1)} kg` : '0.0 kg';
-        document.getElementById('dietAvgPct').textContent = dietStats.tracked > 0 ? `${(dietStats.dPct / dietStats.tracked).toFixed(1)}%` : '0.0%';
-        document.getElementById('dietAvgFat').textContent = dietStats.tracked > 0 ? `${(dietStats.dF / dietStats.tracked).toFixed(1)} kg` : '0.0 kg';
-        document.getElementById('dietAvgMuscle').textContent = dietStats.tracked > 0 ? `${(dietStats.dM / dietStats.tracked).toFixed(1)} kg` : '0.0 kg';
-        document.getElementById('dietAvgVisceral').textContent = dietStats.tracked > 0 ? `${(dietStats.dV / dietStats.tracked).toFixed(1)} 級` : '0.0 級';
-        document.getElementById('dietAvgExerciseRate').textContent = dietStats.totalW > 0 ? `${Math.round((dietStats.aero / dietStats.totalW) * 100)}%` : '0%';
-
-        // Update Med DOM
-        document.getElementById('medGroupCount').textContent = `收案：${medStats.count} 人 (追蹤 ${medStats.tracked} 人)`;
-        document.getElementById('medAvgWeight').textContent = medStats.tracked > 0 ? `${(medStats.dW / medStats.tracked).toFixed(1)} kg` : '0.0 kg';
-        document.getElementById('medAvgPct').textContent = medStats.tracked > 0 ? `${(medStats.dPct / medStats.tracked).toFixed(1)}%` : '0.0%';
-        document.getElementById('medAvgFat').textContent = medStats.tracked > 0 ? `${(medStats.dF / medStats.tracked).toFixed(1)} kg` : '0.0 kg';
-        document.getElementById('medAvgMuscle').textContent = medStats.tracked > 0 ? `${(medStats.dM / medStats.tracked).toFixed(1)} kg` : '0.0 kg';
-        document.getElementById('medAvgVisceral').textContent = medStats.tracked > 0 ? `${(medStats.dV / medStats.tracked).toFixed(1)} 級` : '0.0 級';
-        document.getElementById('medAvgExerciseRate').textContent = medStats.totalW > 0 ? `${Math.round((medStats.aero / medStats.totalW) * 100)}%` : '0%';
-    }
-
-    function toggleDietitianMode() {
-        if (!state.isDietitian) {
-            showCustomModal({
-                icon: '🔐',
-                title: '營養師密碼驗證',
-                message: '請輸入營養師管理密碼：',
-                hasInput: true,
-                inputType: 'password',
-                inputPlaceholder: '請輸入密碼',
-                showCancel: true,
-                onConfirm: (pwd) => {
-                    if (pwd === DIETITIAN_PASSWORD) {
-                        state.isDietitian = true;
-                        document.getElementById('dietitianGroupSection').classList.remove('hidden');
-                        document.getElementById('dietitianToggleBtn').innerHTML = `<span>🔓</span> 管理員模式 (已啟用)`;
-                        document.getElementById('dietitianToggleBtn').className = "px-3 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition flex items-center gap-1.5 shadow-sm";
-                        calculateAndRenderDietitianGroupStats();
-                        showCustomModal({ icon: '✅', title: '身分驗證成功', message: '已進入營養師專屬管理模式，全門診分組統計看板已啟動！' });
-                    } else {
-                        showCustomModal({ icon: '❌', title: '密碼錯誤', message: '管理密碼不正確，請確認後重試。' });
-                    }
-                }
-            });
-        } else {
-            state.isDietitian = false;
-            document.getElementById('dietitianGroupSection').classList.add('hidden');
-            document.getElementById('dietitianToggleBtn').innerHTML = `<span>🔐</span> 營養師身分切換`;
-            document.getElementById('dietitianToggleBtn').className = "px-3 py-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition flex items-center gap-1.5 shadow-sm";
-        }
-    }
-
-    function showApiUrlSettingModal() {
-        showCustomModal({
-            icon: '⚙️',
-            title: '後端 Google Apps Script 網址設定',
-            message: '目前綁定的部署網址：',
-            hasInput: true,
-            inputType: 'text',
-            inputPlaceholder: state.apiUrl,
-            showCancel: true,
-            onConfirm: (newUrl) => {
-                const trimmed = (newUrl || '').trim();
-                if (trimmed) {
-                    state.apiUrl = trimmed.replace(/\/dev(\b|\?)/, '/exec$1');
-                    saveToLocalStorage();
-                    showCustomModal({ icon: '✅', title: '設定成功', message: '後端 API 網址已更新並儲存！' });
-                }
-            }
-        });
-    }
-
-    function openVisualReportModal() {
-        const patient = state.patients[state.activePatientId];
-        if (!patient) return;
-
-        document.getElementById('reportGenDate').textContent = new Date().toLocaleDateString('zh-TW');
-        document.getElementById('repName').textContent = patient.name || '未填寫';
-        document.getElementById('repDemand').textContent = patient.demand || '增肌減脂-減重';
-        document.getElementById('repMethod').textContent = patient.weightLossMethod || '飲食控制';
-        document.getElementById('repWeek').textContent = (state.currentWeek === 0) ? '基準期' : `第 ${state.currentWeek} 周`;
-
-        const base = patient.weeksData[0]?.metrics || {};
-        const cur = patient.weeksData[state.currentWeek]?.metrics || {};
-
-        let dW = null, dF = null, dM = null, dV = null, dWPct = null;
-        if (base.weight !== null && cur.weight !== null) {
-            dW = cur.weight - base.weight;
-            dWPct = base.weight > 0 ? (Math.abs(dW) / base.weight) * 100 : 0;
-            document.getElementById('repWeight').textContent = dW > 0 ? `+${dW.toFixed(1)} kg` : `${dW.toFixed(1)} kg`;
-            document.getElementById('repWeightPct').textContent = `${dWPct.toFixed(1)}%`;
-        } else {
-            document.getElementById('repWeight').textContent = '持平';
-            document.getElementById('repWeightPct').textContent = '0.0%';
-        }
-
-        if (base.fatMass !== null && cur.fatMass !== null) {
-            dF = cur.fatMass - base.fatMass;
-            document.getElementById('repFat').textContent = dF > 0 ? `+${dF.toFixed(1)} kg` : `${dF.toFixed(1)} kg`;
-        } else {
-            document.getElementById('repFat').textContent = '持平';
-        }
-
-        if (base.muscle !== null && cur.muscle !== null) {
-            dM = cur.muscle - base.muscle;
-            document.getElementById('repMuscle').textContent = dM > 0 ? `+${dM.toFixed(1)} kg` : `${dM.toFixed(1)} kg`;
-        } else {
-            document.getElementById('repMuscle').textContent = '持平';
-        }
-
-        if (base.visceralFat !== null && cur.visceralFat !== null) {
-            dV = cur.visceralFat - base.visceralFat;
-            document.getElementById('repVisceral').textContent = dV > 0 ? `+${dV.toFixed(1)} 級` : `${dV.toFixed(1)} 級`;
-        } else {
-            document.getElementById('repVisceral').textContent = '持平';
-        }
-
-        document.getElementById('repAerobic').textContent = document.getElementById('aerobicFrequencyDisplay').textContent;
-        document.getElementById('repResistance').textContent = document.getElementById('resistanceFrequencyDisplay').textContent;
-        document.getElementById('repFeedbackContent').innerHTML = document.getElementById('neutralFeedbackContainer').innerHTML;
-
-        document.getElementById('visualReportModal').classList.remove('hidden');
-    }
-
-    function closeVisualReportModal() {
-        document.getElementById('visualReportModal').classList.add('hidden');
-    }
-
-    function exportCurrentPatientCSV() {
-        const p = state.patients[state.activePatientId];
-        if (!p) return;
-
-        let csv = '\uFEFF';
-        csv += `奇美醫院營養門診 - 個案健康周計畫歷程報表\n`;
-        csv += `個案姓名,${p.name || ''},填寫日期,${p.startDate || ''},目標需求,${p.demand || ''},控制方式,${p.weightLossMethod || ''},目標體重,${p.targetWeight || ''}\n\n`;
-
-        csv += `週次,空腹體重(kg),醫院體重(kg),體脂量(kg),體脂率(%),肌肉量(kg),內臟脂肪(級),體重變化(kg),減重百分比(%),體脂變化(kg),肌肉變化(kg),內臟脂肪變化(級),有氧運動落實,阻力運動落實,當週總分\n`;
-
-        const base = p.weeksData[0]?.metrics || {};
-        for (let i = 0; i <= 12; i++) {
-            const w = p.weeksData[i];
-            const m = w?.metrics || {};
-            const g = w?.goals || {};
-            const weekTitle = (i === 0) ? '基準期' : `第 ${i} 周`;
-
-            let dW = '', dPct = '', dF = '', dM = '', dV = '';
-            if (base.weight !== null && m.weight !== null) {
-                const diff = m.weight - base.weight;
-                dW = diff.toFixed(1);
-                dPct = base.weight > 0 ? ((Math.abs(diff) / base.weight) * 100).toFixed(1) + '%' : '0.0%';
-            }
-            if (base.fatMass !== null && m.fatMass !== null) dF = (m.fatMass - base.fatMass).toFixed(1);
-            if (base.muscle !== null && m.muscle !== null) dM = (m.muscle - base.muscle).toFixed(1);
-            if (base.visceralFat !== null && m.visceralFat !== null) dV = (m.visceralFat - base.visceralFat).toFixed(1);
-
-            let score = 0;
-            Object.values(g).forEach(v => { if (v === 'done') score += 10; else if (v === 'mid') score += 5; });
-
-            csv += `"${weekTitle}","${m.weight ?? ''}","${m.hospitalWeight ?? ''}","${m.fatMass ?? ''}","${m.fatRate ?? ''}","${m.muscle ?? ''}","${m.visceralFat ?? ''}","${dW}","${dPct}","${dF}","${dM}","${dV}","${g.aerobic150m ?? ''}","${g.resistance3x ?? ''}","${score}"\n`;
-        }
-
-        downloadBlob(csv, `奇美營養門診_${p.name || '個案'}_歷程報表.csv`, 'text/csv;charset=utf-8;');
-    }
-
-    function exportAllPatientsMasterCSV() {
-        let csv = '\uFEFF';
-        csv += `奇美醫院營養門診 - 全門診總彙整成果大表\n\n`;
-
-        csv += `個案姓名,填寫日期,目標需求,控制方式,目標體重,最新週次,基準體重,最新體重,累積減重(kg),減重百分比(%),累積減脂(kg),肌肉變化(kg),內臟脂肪變化(級),有氧運動達成週數,阻力運動達成週數\n`;
-
-        Object.values(state.patients).forEach(p => {
-            const base = p.weeksData[0]?.metrics || {};
-            let latestW = null, latestM = null, lastWeekIdx = 0;
-
-            for (let i = 12; i >= 1; i--) {
-                const m = p.weeksData[i]?.metrics;
-                if (m && m.weight !== null) {
-                    latestW = m.weight;
-                    latestM = m;
-                    lastWeekIdx = i;
-                    break;
-                }
-            }
-
-            let dW = '', dPct = '', dF = '', dM = '', dV = '';
-            if (base.weight !== null && latestW !== null) {
-                const diff = latestW - base.weight;
-                dW = diff.toFixed(1);
-                dPct = base.weight > 0 ? ((Math.abs(diff) / base.weight) * 100).toFixed(1) + '%' : '0.0%';
-                if (base.fatMass !== null && latestM.fatMass !== null) dF = (latestM.fatMass - base.fatMass).toFixed(1);
-                if (base.muscle !== null && latestM.muscle !== null) dM = (latestM.muscle - base.muscle).toFixed(1);
-                if (base.visceralFat !== null && latestM.visceralFat !== null) dV = (latestM.visceralFat - base.visceralFat).toFixed(1);
-            }
-
-            let aeroCount = 0, resCount = 0;
-            for (let i = 1; i <= 12; i++) {
-                const g = p.weeksData[i]?.goals;
-                if (g && (g.aerobic150m === 'done' || g.aerobic150m === 'mid')) aeroCount++;
-                if (g && (g.resistance3x === 'done' || g.resistance3x === 'mid')) resCount++;
-            }
-
-            csv += `"${p.name || ''}","${p.startDate || ''}","${p.demand || ''}","${p.weightLossMethod || ''}","${p.targetWeight || ''}","第 ${lastWeekIdx} 周","${base.weight ?? ''}","${latestW ?? ''}","${dW}","${dPct}","${dF}","${dM}","${dV}","${aeroCount} 週","${resCount} 週"\n`;
-        });
-
-        downloadBlob(csv, `奇美營養門診_全門診個案彙整大表_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8;');
-    }
-
-    function downloadBlob(content, filename, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
-    async function submitToGoogleSheet() {
-        const p = state.patients[state.activePatientId];
-        if (!p) return;
-
-        const syncBtn = document.getElementById('syncSheetBtn');
-        const originalText = syncBtn.innerHTML;
-        syncBtn.innerHTML = `<span>⏳</span> 同步傳輸中...`;
-        syncBtn.disabled = true;
-
-        const payload = {
-            profile: {
-                name: p.name || '未填寫',
-                startDate: p.startDate || '',
-                demand: p.demand || '增肌減脂-減重',
-                weightLossMethod: p.weightLossMethod || '飲食控制',
-                targetWeight: p.targetWeight || null
-            },
-            currentWeek: state.currentWeek,
-            weeksData: p.weeksData
-        };
-
-        try {
-            await fetch(state.apiUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            showCustomModal({
-                icon: '🎉',
-                title: '同步送出成功！',
-                message: `已成功將【${p.name || '個案'}】第 ${state.currentWeek} 周紀錄發送至奇美醫院後端 Google 試算表，自動運算第二頁籤全期成果！`
-            });
-        } catch (err) {
-            console.error("Submission error:", err);
-            showCustomModal({
-                icon: '⚠️',
-                title: '傳輸提醒',
-                message: '資料已在瀏覽器本機安全儲存。若雲端同步有延遲，請確認網路連線或 Apps Script 部署權限。'
-            });
-        } finally {
-            syncBtn.innerHTML = originalText;
-            syncBtn.disabled = false;
-        }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        initDatabase();
-        renderPatientSelect();
-        loadActivePatientProfile();
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('recordDate').valueAsDate = new Date();
     });
-</script>
+  </script>
 </body>
 </html>
