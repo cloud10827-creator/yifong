@@ -197,7 +197,7 @@
                 <input type="text" id="patientName" oninput="handlePatientNameInput(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
             </div>
             <div>
-                <label class="text-[11px] font-bold text-slate-500 mb-1 block">開案 / 門診日期</label>
+                <label class="text-[11px] font-bold text-slate-500 mb-1 block">填寫日期</label>
                 <input type="date" id="startDate" onchange="saveCurrentProfile()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-rose-400">
             </div>
             <div>
@@ -485,7 +485,7 @@
 </div>
 
 <script>
-    const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzK90WesvLTreKS11yL2QnYkwXxIEe1wRc80seGAvFk-d9ZRdNz-Dfe-ujDce1bG4Az/exec";
+    const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzt_ZpwlB2wXa4nWKi8SZ-7bih8v8O8ERCQZhovGJa32skcgq3jNkHyoeI4jxdu5LIT/exec";
     const DIETITIAN_PASSWORD = "chimei888";
 
     const GOAL_DEFINITIONS = [
@@ -562,7 +562,7 @@
             if (stored) {
                 const parsed = JSON.parse(stored);
                 state.patients = parsed.patients || {};
-                // 強制採用最新正式發布的 Apps Script 網址，清除使用者端可能殘留的舊網址或 /dev 測試網址
+                // 強制採用最新正式發布的 Apps Script 網址，清除舊快取
                 state.apiUrl = DEFAULT_APPS_SCRIPT_URL;
                 state.activePatientId = parsed.lastActivePatient || Object.keys(state.patients)[0] || "default";
             }
@@ -834,7 +834,6 @@
         const patient = state.patients[state.activePatientId];
         if (!patient) return;
 
-        // Baseline (Week 0 or first valid week)
         const base = patient.weeksData[0]?.metrics || {};
         const cur = patient.weeksData[state.currentWeek]?.metrics || {};
 
@@ -866,7 +865,7 @@
 
         if (base.muscle !== null && cur.muscle !== null) {
             dM = cur.muscle - base.muscle;
-            formatDeltaBadge(dMEl, dM, 'kg', false); // muscle increase is positive
+            formatDeltaBadge(dMEl, dM, 'kg', false);
         } else {
             dMEl.textContent = "持平";
         }
@@ -878,7 +877,6 @@
             dVEl.textContent = "持平";
         }
 
-        // Exercise frequency calculation
         let aeroWeeks = 0, resWeeks = 0, recordedWeeks = 0;
         for (let i = 1; i <= 12; i++) {
             const w = patient.weeksData[i];
@@ -895,7 +893,6 @@
         document.getElementById('aerobicFrequencyDisplay').textContent = `${aeroWeeks} 週達標 (${aeroPct}%)`;
         document.getElementById('resistanceFrequencyDisplay').textContent = `${resWeeks} 週達標 (${resPct}%)`;
 
-        // Render Neutral Objective Feedback
         renderNeutralFeedback({ dW, dF, dM, dV, aeroPct, resPct });
     }
 
@@ -966,7 +963,6 @@
             `;
         }
 
-        // Add dietitian consultation guidance
         html += `
             <div class="pt-2 border-t border-amber-200/60 flex flex-wrap items-center justify-between gap-1 text-[11px] text-amber-800">
                 <span>💬 <strong>溫馨提示：</strong>若對數值波動有任何疑慮或遇代謝停滯期，歡迎預約回診與門診營養師面對面微調。</span>
@@ -1068,7 +1064,6 @@
             grp.count++;
 
             const base = p.weeksData[0]?.metrics || {};
-            // Find latest recorded week
             let latest = null;
             for (let i = 12; i >= 1; i--) {
                 const m = p.weeksData[i]?.metrics;
@@ -1230,7 +1225,7 @@
 
         let csv = '\uFEFF';
         csv += `奇美醫院營養門診 - 個案健康周計畫歷程報表\n`;
-        csv += `個案姓名,${p.name || ''},開案日期,${p.startDate || ''},目標需求,${p.demand || ''},控制方式,${p.weightLossMethod || ''},目標體重,${p.targetWeight || ''}\n\n`;
+        csv += `個案姓名,${p.name || ''},填寫日期,${p.startDate || ''},目標需求,${p.demand || ''},控制方式,${p.weightLossMethod || ''},目標體重,${p.targetWeight || ''}\n\n`;
 
         csv += `週次,空腹體重(kg),醫院體重(kg),體脂量(kg),體脂率(%),肌肉量(kg),內臟脂肪(級),體重變化(kg),減重百分比(%),體脂變化(kg),肌肉變化(kg),內臟脂肪變化(級),有氧運動落實,阻力運動落實,當週總分\n`;
 
@@ -1264,7 +1259,7 @@
         let csv = '\uFEFF';
         csv += `奇美醫院營養門診 - 全門診總彙整成果大表\n\n`;
 
-        csv += `個案姓名,開案日期,目標需求,控制方式,目標體重,最新週次,基準體重,最新體重,累積減重(kg),減重百分比(%),累積減脂(kg),肌肉變化(kg),內臟脂肪變化(級),有氧運動達成週數,阻力運動達成週數\n`;
+        csv += `個案姓名,填寫日期,目標需求,控制方式,目標體重,最新週次,基準體重,最新體重,累積減重(kg),減重百分比(%),累積減脂(kg),肌肉變化(kg),內臟脂肪變化(級),有氧運動達成週數,阻力運動達成週數\n`;
 
         Object.values(state.patients).forEach(p => {
             const base = p.weeksData[0]?.metrics || {};
