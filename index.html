@@ -6,32 +6,30 @@
   <title>體重控制周計畫 - 奇美醫療財團法人奇美醫院 營養科門診</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", Roboto, sans-serif;
-      background-color: #fdfbf7;
+      background-color: #fefce8;
       color: #334155;
       -webkit-font-smoothing: antialiased;
     }
     .main-container {
-      max-width: 680px;
+      max-width: 720px;
       margin: 0 auto;
     }
     .card-base {
       background: #ffffff;
       border-radius: 1.5rem;
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+      border: 1px solid #fef08a;
+      box-shadow: 0 4px 20px -2px rgba(234, 179, 8, 0.06);
     }
-    /* 漸層名片卡 */
     .prescription-card {
       background: linear-gradient(135deg, #fff7ed 0%, #fef2f2 50%, #f0fdf4 100%);
       border: 1.5px solid #fed7aa;
       border-radius: 1.25rem;
     }
-    /* 5大指標顏色卡片 */
     .metric-box-yellow {
       background-color: #fefce8;
       border: 1.5px solid #fef08a;
@@ -52,7 +50,6 @@
       border: 1.5px solid #a5f3fc;
       border-radius: 1rem;
     }
-    /* 運動雙卡片 */
     .sport-card-blue {
       background-color: #eff6ff;
       border: 1.5px solid #bfdbfe;
@@ -63,12 +60,17 @@
       border: 1.5px solid #bbf7d0;
       border-radius: 1rem;
     }
-    /* 榮耀榜橫幅與白底小卡 */
     .glory-banner {
       background-color: #fdf2f8;
       border: 1px solid #fce7f3;
       border-radius: 0.75rem;
       color: #be185d;
+    }
+    .neutral-banner {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.75rem;
+      color: #475569;
     }
     .honor-item {
       background-color: #ffffff;
@@ -76,9 +78,17 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.03);
       border-radius: 0.75rem;
     }
+    .guide-box {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.625rem;
+    }
     .number-display {
       font-feature-settings: "tnum";
       font-variant-numeric: tabular-nums;
+    }
+    input[type=radio] {
+      accent-color: #0d9488;
     }
     @media print {
       body { background: white !important; }
@@ -91,11 +101,11 @@
 
   <div class="main-container">
     
-    <!-- 頂部導航與功能按鈕 -->
+    <!-- 頂部列 -->
     <header class="flex justify-between items-center mb-4 px-1 no-print">
       <div class="flex items-center space-x-2">
         <span class="text-xl">🥗</span>
-        <span class="text-sm font-semibold text-slate-600">奇美醫院 營養科門診</span>
+        <span class="text-xs sm:text-sm font-semibold text-slate-700">奇美醫療財團法人奇美醫院 營養科門診</span>
       </div>
       <div class="flex space-x-2">
         <button onclick="openModal('reportModal')" class="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 rounded-full text-xs font-bold transition flex items-center shadow-sm">
@@ -111,14 +121,19 @@
     <main class="card-base p-5 sm:p-7 space-y-6">
 
       <!-- 標題區 -->
-      <section class="text-center space-y-1 pb-4 border-b border-slate-100">
+      <section class="text-center space-y-1 pb-4 border-b border-amber-100/80">
         <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">體重控制周計畫</h1>
-        <p class="text-xs sm:text-sm text-slate-500 font-medium">個人化飲食紀錄 ✕ 生理數據 ✕ 習慣養成追蹤</p>
+        <p class="text-xs sm:text-sm text-slate-500 font-medium">個人化飲食紀錄 ✕ 生理數據 ✕ 習慣養成追蹤 (3個月12週完整版)</p>
       </section>
 
-      <!-- 基本資料 -->
-      <section class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100 space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <!-- 1. 基本資料 -->
+      <section class="bg-amber-50/50 p-4 sm:p-5 rounded-2xl border border-amber-100 space-y-4">
+        <div class="flex items-center space-x-1.5 text-xs font-bold text-amber-900 border-b border-amber-200/60 pb-2">
+          <span>👤</span>
+          <span>個案基本資料與計畫設定</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1">個案姓名</label>
             <input type="text" id="caseName" value="吳柚子" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500">
@@ -126,6 +141,10 @@
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1">填寫日期</label>
             <input type="date" id="recordDate" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">目標體重 (kg)</label>
+            <input type="number" step="0.1" id="goalWeight" value="45.0" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-800 text-center focus:outline-none focus:ring-2 focus:ring-teal-500">
           </div>
         </div>
 
@@ -147,277 +166,117 @@
           </div>
           <div class="col-span-2 sm:col-span-1">
             <label class="block text-xs font-bold text-slate-600 mb-1">目前進度週次</label>
-            <select id="currentWeek" onchange="refreshView()" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs sm:text-sm font-semibold text-slate-700">
+            <select id="currentWeek" onchange="handleWeekChange()" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs sm:text-sm font-semibold text-slate-700">
               <option value="0">第 0 週 (基準開案)</option>
               <option value="1">第 1 週</option>
               <option value="2">第 2 週</option>
               <option value="3" selected>第 3 週</option>
               <option value="4">第 4 週</option>
+              <option value="5">第 5 週</option>
+              <option value="6">第 6 週</option>
+              <option value="7">第 7 週</option>
               <option value="8">第 8 週 (期中滿意度)</option>
+              <option value="9">第 9 週</option>
+              <option value="10">第 10 週</option>
+              <option value="11">第 11 週</option>
               <option value="12">第 12 週 (結案成果)</option>
             </select>
           </div>
         </div>
       </section>
 
-      <!-- 營養師專屬分析報告 -->
-      <section class="space-y-4">
-        <div class="flex items-center space-x-2">
-          <span class="text-xl">💡</span>
+      <!-- 2. 晨間身體量測數據 -->
+      <section class="bg-amber-50/40 p-4 rounded-2xl border border-amber-100/70 space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-1.5">
+            <span class="text-base">⚖️</span>
+            <h2 class="text-xs sm:text-sm font-bold text-slate-800">本週晨間身體量測數據</h2>
+          </div>
+          <span class="text-[11px] text-amber-700 font-medium">晨起空腹量測為準</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div>
-            <h2 class="text-lg font-bold text-slate-800">營養師專屬分析報告</h2>
-            <p class="text-xs text-slate-500">習慣改變 ➔ 身體組成變化 正向因果回饋</p>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">空腹體重 (kg)</label>
+            <input type="number" step="0.1" id="inputWeight" value="58.2" oninput="calculateMetrics()" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-sm font-bold text-slate-800 text-center">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">體脂肪率 (%)</label>
+            <input type="number" step="0.1" id="inputFatRate" value="28.5" oninput="calculateMetrics()" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-sm font-bold text-slate-800 text-center">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">肌肉量 (kg)</label>
+            <input type="number" step="0.1" id="inputMuscle" value="22.1" oninput="calculateMetrics()" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-sm font-bold text-slate-800 text-center">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">內臟脂肪 (級)</label>
+            <input type="number" step="0.5" id="inputVat" value="4.0" oninput="calculateMetrics()" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-sm font-bold text-slate-800 text-center">
           </div>
         </div>
-
-        <!-- 累積努力成果卡片 -->
-        <div class="p-4 sm:p-5 bg-white border border-slate-100 rounded-2xl shadow-sm space-y-4">
-          <div class="flex justify-between items-center">
-            <div class="flex items-center space-x-1.5">
-              <span class="text-base">🏆</span>
-              <span class="text-sm font-bold text-amber-900">累積努力成果與身體正向回饋</span>
-            </div>
-            <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">與基準週相比</span>
-          </div>
-
-          <!-- 5 大成果指標方格 -->
-          <div class="grid grid-cols-2 gap-3">
-            <div class="metric-box-yellow p-3 text-center">
-              <p class="text-xs font-bold text-slate-600">體重增減</p>
-              <p class="text-xl sm:text-2xl font-black text-emerald-600 number-display mt-0.5">-0.6 kg</p>
-            </div>
-            <div class="metric-box-pink p-3 text-center">
-              <p class="text-xs font-bold text-slate-600">減輕百分比</p>
-              <p class="text-xl sm:text-2xl font-black text-rose-600 number-display mt-0.5">1.1%</p>
-            </div>
-            <div class="metric-box-yellow p-3 text-center">
-              <p class="text-xs font-bold text-slate-600">體脂肪量</p>
-              <p class="text-xl sm:text-2xl font-black text-emerald-600 number-display mt-0.5">-0.8 kg</p>
-            </div>
-            <div class="metric-box-green p-3 text-center">
-              <p class="text-xs font-bold text-slate-600">肌肉量</p>
-              <p class="text-xl sm:text-2xl font-black text-emerald-600 number-display mt-0.5">+0.2 kg</p>
-            </div>
-            <div class="metric-box-cyan col-span-2 p-3 text-center">
-              <p class="text-xs font-bold text-slate-600">內臟脂肪</p>
-              <p class="text-xl sm:text-2xl font-black text-emerald-600 number-display mt-0.5">-1.0 級</p>
-            </div>
-          </div>
-
-          <!-- 運動累計落實 -->
-          <div class="grid grid-cols-2 gap-3 pt-1">
-            <div class="sport-card-blue p-3 flex flex-col justify-between items-center text-center">
-              <p class="text-xs font-bold text-blue-900">🏃 有氧運動 150分/周</p>
-              <p class="text-lg sm:text-xl font-extrabold text-blue-600 number-display mt-1">2 / 3 週達標</p>
-            </div>
-            <div class="sport-card-green p-3 flex flex-col justify-between items-center text-center">
-              <p class="text-xs font-bold text-emerald-900">🏋️ 阻力運動 3次/周</p>
-              <p class="text-lg sm:text-xl font-extrabold text-emerald-600 number-display mt-1">2 / 3 週達標</p>
-            </div>
-          </div>
-
-          <!-- 正向回饋具體清單 -->
-          <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-100/60 space-y-2.5">
-            <p class="text-xs font-bold text-amber-800 flex items-center">
-              ✨ 覺察良好控制下的身體正向變化：
-            </p>
-            <ul class="text-xs sm:text-sm text-slate-700 space-y-2 leading-relaxed">
-              <li class="flex items-start">
-                <span class="text-emerald-500 mr-1.5 font-bold">●</span>
-                <span>落實<strong>【低油飲食過水漂洗 / 避免精製糖 / 提早晚餐】</strong>，體內胰島素趨於平穩，成功帶動體脂肪大幅降低 <strong>0.8 kg</strong>！</span>
-              </li>
-              <li class="flex items-start">
-                <span class="text-emerald-500 mr-1.5 font-bold">●</span>
-                <span>維持<strong>【充足睡眠 7 小時 / 提早睡覺】</strong>，促進瘦體素 (Leptin) 良好作用並壓制皮質醇，加速夜間燃脂！</span>
-              </li>
-              <li class="flex items-start">
-                <span class="text-emerald-500 mr-1.5 font-bold">●</span>
-                <span>藉由<strong>【有氧運動 150 分鐘與低油清淡飲食】</strong>，成功使深層內臟脂肪降低 <strong>1.0 級</strong>，顯著降低心血管代謝負擔！</span>
-              </li>
-              <li class="flex items-start">
-                <span class="text-emerald-500 mr-1.5 font-bold">●</span>
-                <span>落實<strong>【每日足夠水量 2500~3000ml】</strong>，有效帶動身體新陳代謝、利尿排除多餘水腫，累計體重減輕 <strong>0.6 kg</strong>！</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- 榮耀榜橫幅 -->
-        <div class="glory-banner px-4 py-2.5 flex items-center space-x-1.5 font-bold text-xs sm:text-sm">
-          <span>🌟</span>
-          <span>榮耀榜！(完全達標 10分項目)</span>
-        </div>
-
-        <!-- 達標項目卡片清單 -->
-        <div class="space-y-2">
-          <div class="honor-item p-3 flex items-start space-x-3">
-            <span class="text-xl">💧</span>
-            <div>
-              <p class="text-xs sm:text-sm font-bold text-slate-800">足夠水量</p>
-              <p class="text-xs text-slate-600 mt-0.5">水分充足有效促進身體新陳代謝，加速假性飢餓代謝！</p>
-            </div>
-          </div>
-          <div class="honor-item p-3 flex items-start space-x-3">
-            <span class="text-xl">🥩</span>
-            <div>
-              <p class="text-xs sm:text-sm font-bold text-slate-800">足夠蛋白質</p>
-              <p class="text-xs text-slate-600 mt-0.5">每餐蛋白質足量，為肌肉修復與燃脂提供頂級燃料！</p>
-            </div>
-          </div>
-          <div class="honor-item p-3 flex items-start space-x-3">
-            <span class="text-xl">🥗</span>
-            <div>
-              <p class="text-xs sm:text-sm font-bold text-slate-800">足夠蔬菜</p>
-              <p class="text-xs text-slate-600 mt-0.5">高膳食纖維完美包覆油脂，有效穩定血糖並維持腸道健康！</p>
-            </div>
-          </div>
-          <div class="honor-item p-3 flex items-start space-x-3">
-            <span class="text-xl">🌙</span>
-            <div>
-              <p class="text-xs sm:text-sm font-bold text-slate-800">減少晚進食</p>
-              <p class="text-xs text-slate-600 mt-0.5">晚上八點前完成晚餐，給予消化道充份休息與燃脂空檔！</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 門診預約回診關懷卡 -->
-        <div class="bg-teal-50/60 p-4 rounded-2xl border border-teal-100 flex items-start space-x-3">
-          <span class="text-xl">👩‍⚕️</span>
-          <div class="text-xs sm:text-sm space-y-1">
-            <p class="font-bold text-teal-900">需要專屬個別化微調嗎？歡迎預約回診！</p>
-            <p class="text-slate-600 leading-relaxed">
-              體重與體脂的起伏是身體對環境與生活作息的生理適應訊號。若您在減重歷程遇到停滯期、外食選擇困難，建議預約回診與門診營養師面對面微調專屬計畫。
-            </p>
-            <p class="font-semibold text-teal-800 pt-0.5">
-              📞 奇美醫院營養門診專線：<a href="tel:0911561359" class="underline font-bold">0911-561-359</a> 或 (06)281-2811 分機 52522
-            </p>
-          </div>
-        </div>
-
       </section>
 
-      <!-- 送出按鈕 -->
-      <section class="pt-2 no-print">
-        <button onclick="mockSubmit()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-md transition text-sm sm:text-base flex justify-center items-center space-x-2">
-          <span>🚀 確認送出本周紀錄</span>
-        </button>
+      <!-- 3. 🎯 11 大生活習慣養成目標（含灰底小字指引） -->
+      <section class="space-y-4">
+        <div class="flex justify-between items-center pb-1">
+          <div class="flex items-center space-x-1.5">
+            <span class="text-xl">🎯</span>
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-slate-800">11 大生活習慣養成目標</h2>
+              <p class="text-xs text-slate-500">依據本週落實天數評估（完成=10分 / 3~5天=5分 / &lt;3天=0分）</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400">總得分</span>
+            <p id="totalScoreText" class="text-xl font-black text-teal-600 number-display">100 / 110</p>
+          </div>
+        </div>
+
+        <!-- 11 項卡片容器 -->
+        <div class="space-y-3.5" id="tasksContainer">
+          <!-- JS 自動動態渲染 -->
+        </div>
       </section>
 
-    </main>
-
-    <footer class="text-center py-6 text-xs text-slate-400 no-print">
-      奇美醫療財團法人奇美醫院 營養科門診 ✕ 體重控制健康管理系統
-    </footer>
-
-  </div>
-
-  <!-- 圖像化建議書 Modal -->
-  <div id="reportModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5 shadow-2xl">
-      
-      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-        <h3 class="font-bold text-slate-800 text-base sm:text-lg flex items-center space-x-1.5">
-          <span>📑</span>
-          <span>個人圖像化進展總結與營養師建議書</span>
-        </h3>
-        <button onclick="closeModal('reportModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">✕</button>
-      </div>
-
-      <!-- 漸層諮詢處方名片卡 -->
-      <div class="prescription-card p-4 sm:p-5 space-y-2">
-        <div class="inline-block bg-rose-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-          個人諮詢處方
+      <!-- 4. 第 8 週 / 第 12 週滿意度問卷 -->
+      <section id="surveySection" class="hidden p-4 sm:p-5 bg-rose-50/50 border border-rose-100 rounded-2xl space-y-4">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">📝</span>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-rose-900" id="surveyTitle">滿意度回饋問卷</h3>
+            <p class="text-xs text-rose-700">感謝您的參與，您的回饋是門診持續優化指引的重要參考依據</p>
+          </div>
         </div>
-        <h4 class="text-lg sm:text-xl font-black text-slate-800">
-          吳柚子 的 3 個月減重成效與生活型態總結
-        </h4>
-        <div class="text-xs text-slate-600 space-y-0.5 pt-1">
-          <p>填寫日期：2026-09-14 ｜ 目標需求：增肌減脂-減重</p>
-          <p>控制方式：飲食控制 ｜ 目標體重：45 kg ｜ 當前週次：第 3 週</p>
-          <p class="font-semibold text-slate-700 pt-1">奇美醫療財團法人奇美醫院 營養科門診</p>
-        </div>
-      </div>
-
-      <!-- 建議書 5 大指標 -->
-      <div class="grid grid-cols-2 gap-2.5">
-        <div class="metric-box-yellow p-2.5 text-center">
-          <p class="text-[11px] font-bold text-slate-600">累積體重變化</p>
-          <p class="text-lg font-black text-emerald-600 number-display">-0.6 kg</p>
-        </div>
-        <div class="metric-box-pink p-2.5 text-center">
-          <p class="text-[11px] font-bold text-slate-600">減輕百分比</p>
-          <p class="text-lg font-black text-rose-600 number-display">1.1%</p>
-        </div>
-        <div class="metric-box-yellow p-2.5 text-center">
-          <p class="text-[11px] font-bold text-slate-600">累積體脂量</p>
-          <p class="text-lg font-black text-emerald-600 number-display">-0.8 kg</p>
-        </div>
-        <div class="metric-box-green p-2.5 text-center">
-          <p class="text-[11px] font-bold text-slate-600">累積肌肉量</p>
-          <p class="text-lg font-black text-emerald-600 number-display">+0.2 kg</p>
-        </div>
-        <div class="metric-box-cyan col-span-2 p-2.5 text-center">
-          <p class="text-[11px] font-bold text-slate-600">內臟脂肪變化</p>
-          <p class="text-lg font-black text-emerald-600 number-display">-1.0 級</p>
-        </div>
-      </div>
-
-      <!-- 具體生活處方 -->
-      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
-        <p class="font-bold text-slate-800 flex items-center">
-          <span class="mr-1">👩‍⚕️</span> 門診營養師個人化具體建議與生活處方：
-        </p>
-        <ul class="space-y-2 pl-1">
-          <li><strong>● 飲食與代謝基石：</strong>每日維持 2500~3000ml 水分，午晚餐落實外食過水去油，深綠色蔬菜攝取足 5 份以上（早1午2晚2），有效平穩胰島素與血糖。</li>
-          <li><strong>● 肌肉保護與燃脂引擎：</strong>每餐補足 3~4 份優質蛋白質，下午 3 點搭配無糖濃豆漿或乳清蛋白，並維持每週 3 次深蹲與死蟲式阻力訓練，守護基礎代謝率。</li>
-          <li><strong>● 晚進食與停滯期對策：</strong>盡量於晚間 8 點前完成進食；遇體重停滯時可諮詢營養師啟動 52 輕斷食或調整三大營養素比例。</li>
-        </ul>
-      </div>
-
-      <div class="flex space-x-2 pt-1 no-print">
-        <button onclick="window.print()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs sm:text-sm transition">
-          🖨️ 列印 / 另存為 PDF
-        </button>
-        <button onclick="closeModal('reportModal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs sm:text-sm transition">
-          關閉
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- 後台 Modal 簡版 -->
-  <div id="authorModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center">
-        <h3 class="font-bold text-slate-800 text-base">🔒 營養師後台管理認證</h3>
-        <button onclick="closeModal('authorModal')" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
-      </div>
-      <p class="text-xs text-slate-500">請輸入營養門診專屬管理密碼以查看純飲食組與藥物組統計看板：</p>
-      <input type="password" id="adminPwd" placeholder="請輸入密碼 (預設: chimei888)" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-      <div class="flex space-x-2 pt-2">
-        <button onclick="alert('登入成功！已解鎖作者分組統計儀表板與全門診數據。')" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 rounded-xl text-xs transition">確認登入</button>
-        <button onclick="closeModal('authorModal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2 rounded-xl text-xs transition">取消</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    function openModal(id) {
-      document.getElementById(id).classList.remove('hidden');
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
-    }
-    function refreshView() {
-      // 模擬切換週次
-    }
-    function mockSubmit() {
-      alert('模擬送出成功！資料將透過最新 Google Apps Script Web App 同步寫入您的 Google 試算表。');
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('recordDate').valueAsDate = new Date();
-    });
-  </script>
-</body>
-</html>
+        <div class="space-y-3 text-xs sm:text-sm">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">1. 您對本週計畫整體指引與成效追蹤的滿意度：</label>
+            <select id="surveyQ1" class="w-full bg-white border border-rose-200 rounded-xl p-2 text-slate-700">
+              <option value="5" selected>非常滿意 (5分)</option>
+              <option value="4">滿意 (4分)</option>
+              <option value="3">普通 (3分)</option>
+              <option value="2">不滿意 (2分)</option>
+              <option value="1">非常不滿意 (1分)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">2. 營養師建議與微調處方對您日常外食/作息的實用性：</label>
+            <select id="surveyQ2" class="w-full bg-white border border-rose-200 rounded-xl p-2 text-slate-700">
+              <option value="5" selected>非常實用 (5分)</option>
+              <option value="4">實用 (4分)</option>
+              <option value="3">普通 (3分)</option>
+              <option value="2">不實用 (2分)</option>
+              <option value="1">非常不實用 (1分)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">3. 本系統之介面操作與數據圖像化回饋好用程度：</label>
+            <select id="surveyQ3" class="w-full bg-white border border-rose-200 rounded-xl p-2 text-slate-700">
+              <option value="5" selected>非常滿意 (5分)</option>
+              <option value="4">滿意 (4分)</option>
+              <option value="3">普通 (3分)</option>
+              <option value="2">不滿意 (2分)</option>
+              <option value="1">非常不滿意 (1分)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">4. 營養師諮詢過程之專業度與親和力：</label>
+            <select id="surveyQ4" class="w-full bg-white border border-rose-200 rounded-xl p-2 text-slate-700">
+              <option value="5" selected>非常
