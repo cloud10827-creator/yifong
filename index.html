@@ -202,13 +202,14 @@
       </div>
     </header>
 
+    <!-- 個案基本資料與成果追蹤卡片 (預設姓名空白，純記憶個案自己輸入) -->
     <section class="neo-card p-6 sm:p-8 space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-orange-100 gap-3">
         <div class="flex items-center space-x-3 flex-wrap gap-y-2">
           <span class="text-3xl">📋</span>
           <h2 class="text-xl sm:text-2xl font-black text-slate-900">個案基本資料與成果追蹤</h2>
-          <span id="patientStatusBadge" class="px-3.5 py-1.5 bg-emerald-100 text-emerald-900 text-sm sm:text-base font-black rounded-full border border-emerald-300">
-            🟢 已載入個案：吳柚子 (2 週紀錄)
+          <span id="patientStatusBadge" class="px-3.5 py-1.5 bg-slate-100 text-slate-800 text-sm sm:text-base font-black rounded-full border border-slate-300">
+            ⚪ 請輸入姓名以建立或載入個案紀錄
           </span>
         </div>
 
@@ -224,9 +225,9 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 pt-1">
         <div>
           <label class="block text-sm sm:text-base font-black text-slate-800 mb-1.5">
-            個案姓名 <span class="text-rose-600">*</span> <span class="text-xs sm:text-sm text-emerald-700 font-black">(自動載入歷史)</span>
+            個案姓名 <span class="text-rose-600">*</span> <span class="text-xs sm:text-sm text-emerald-700 font-black">(輸入即自動記憶)</span>
           </label>
-          <input type="text" id="patientName" oninput="handleNameInput(this.value)" value="吳柚子" placeholder="例：吳柚子" class="w-full neo-input px-4 py-3 font-black text-slate-900">
+          <input type="text" id="patientName" oninput="handleNameInput(this.value)" placeholder="例：陳小美" class="w-full neo-input px-4 py-3 font-black text-slate-900">
         </div>
 
         <div>
@@ -236,7 +237,7 @@
 
         <div>
           <label class="block text-sm sm:text-base font-black text-slate-800 mb-1.5">目標體重 (Kg)</label>
-          <input type="number" step="0.1" id="targetWeight" oninput="saveProfile()" placeholder="例如：45.0" class="w-full neo-input px-4 py-3 font-black text-slate-900">
+          <input type="number" step="0.1" id="targetWeight" oninput="saveProfile()" placeholder="例如：50.0" class="w-full neo-input px-4 py-3 font-black text-slate-900">
         </div>
 
         <div>
@@ -265,7 +266,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      <!-- 左側 6 大數據輸入 -->
+      <!-- 左側 6 大數據輸入 (晨間數據檢測六個欄位刪除 placeholder) -->
       <section class="lg:col-span-2 neo-card p-6 sm:p-8 space-y-5">
         <div class="flex items-center justify-between border-b border-orange-100 pb-3 flex-wrap gap-2">
           <div class="flex items-center space-x-3">
@@ -283,27 +284,27 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-black text-slate-800 mb-1.5">晨間空腹體重 (kg)</label>
-            <input type="number" step="0.1" id="mWeight" oninput="updateCurrentMetrics('weight', this.value)" placeholder="例如: 64.2" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
+            <input type="number" step="0.1" id="mWeight" oninput="updateCurrentMetrics('weight', this.value)" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
           </div>
           <div>
             <label class="block text-sm font-black text-slate-800 mb-1.5">門診醫院體重 (kg)</label>
-            <input type="number" step="0.1" id="mHospitalWeight" oninput="updateCurrentMetrics('hospitalWeight', this.value)" placeholder="例如: 64.3" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
+            <input type="number" step="0.1" id="mHospitalWeight" oninput="updateCurrentMetrics('hospitalWeight', this.value)" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
           </div>
           <div>
             <label class="block text-sm font-black text-slate-800 mb-1.5">體脂肪量 (kg)</label>
-            <input type="number" step="0.1" id="mFatMass" oninput="updateCurrentMetrics('fatMass', this.value)" placeholder="例如: 19.5" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
+            <input type="number" step="0.1" id="mFatMass" oninput="updateCurrentMetrics('fatMass', this.value)" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
           </div>
           <div>
             <label class="block text-sm font-black text-slate-800 mb-1.5">體脂肪率 (%)</label>
-            <input type="number" step="0.1" id="mFatRate" oninput="updateCurrentMetrics('fatRate', this.value)" placeholder="例如: 30.3" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
+            <input type="number" step="0.1" id="mFatRate" oninput="updateCurrentMetrics('fatRate', this.value)" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
           </div>
           <div>
             <label class="block text-sm font-black text-slate-800 mb-1.5">肌肉量 (kg)</label>
-            <input type="number" step="0.1" id="mMuscle" oninput="updateCurrentMetrics('muscle', this.value)" placeholder="例如: 42.4" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
+            <input type="number" step="0.1" id="mMuscle" oninput="updateCurrentMetrics('muscle', this.value)" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
           </div>
           <div>
             <label class="block text-sm font-black text-slate-800 mb-1.5">內臟脂肪 (級)</label>
-            <input type="number" step="0.5" id="mVisceral" oninput="updateCurrentMetrics('visceralFat', this.value)" placeholder="例如: 5.5" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
+            <input type="number" step="0.5" id="mVisceral" oninput="updateCurrentMetrics('visceralFat', this.value)" class="w-full neo-input p-3.5 font-black text-center text-slate-900 text-lg sm:text-xl">
           </div>
         </div>
       </section>
@@ -331,6 +332,7 @@
 
     </div>
 
+    <!-- 11 大生活習慣檢核 -->
     <section class="neo-card p-6 sm:p-8 space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-orange-100 gap-2">
         <div class="flex items-center space-x-3">
@@ -349,6 +351,7 @@
       <div id="goalsListContainer" class="space-y-4"></div>
     </section>
 
+    <!-- 累積努力成果與身體組成變化 -->
     <section class="neo-card p-6 sm:p-8 space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-orange-100 gap-2">
         <div class="flex items-center space-x-3">
@@ -448,6 +451,7 @@
       </div>
     </section>
 
+    <!-- 0~12 週全期歷史總表 -->
     <section class="neo-card p-6 sm:p-8 space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-orange-100 flex-wrap gap-2">
         <div class="flex items-center space-x-2.5">
@@ -505,6 +509,7 @@
 
   </main>
 
+  <!-- 個人圖像化進展總結與營養師建議書彈窗 (完全還原截圖排版，適配 A4 列印) -->
   <div id="reportModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto p-5 sm:p-7 shadow-2xl space-y-4 border border-orange-100">
       
@@ -521,7 +526,7 @@
         </button>
       </div>
 
-      <!-- 可列印與下載的核心內容區域 -->
+      <!-- 可列印與下載的核心內容區域 (還原經典手機截圖排版) -->
       <div id="printableReportArea" class="space-y-4">
         
         <!-- 頂部個人諮詢處方大卡片 -->
@@ -530,14 +535,14 @@
             個人諮詢處方
           </div>
           <h4 id="repCardTitle" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
-            吳柚子 的 3 個月減重成效與生活型態總結
+            3 個月減重成效與生活型態總結
           </h4>
           <div class="text-sm text-slate-800 font-bold space-y-1.5 pt-1 leading-relaxed">
             <p id="repSubLine1">
-              填寫日期：2026-09-14 ｜ 目標需求：增肌減脂-減重
+              填寫日期：- ｜ 目標需求：增肌減脂-減重
             </p>
             <p id="repSubLine2">
-              控制方式：飲食控制 ｜ 目標體重：45.0 kg ｜ 當前週次：第 2 周
+              控制方式：飲食控制 ｜ 目標體重：- kg ｜ 當前週次：第 1 周
             </p>
             <p class="font-black text-slate-900 pt-1 flex justify-end text-xs sm:text-sm">
               奇美醫療財團法人奇美醫院 營養科門診
@@ -549,23 +554,23 @@
         <div class="grid grid-cols-2 gap-3">
           <div class="metric-box-yellow p-4 text-center flex flex-col justify-center">
             <p class="text-sm font-black text-slate-800">累積體重變化</p>
-            <p id="repDeltaW" class="text-2xl sm:text-3xl font-black text-rose-600 number-display mt-1">+1.3 kg</p>
+            <p id="repDeltaW" class="text-2xl sm:text-3xl font-black text-rose-600 number-display mt-1">0.0 kg</p>
           </div>
           <div class="metric-box-pink p-4 text-center flex flex-col justify-center">
             <p class="text-sm font-black text-slate-800">減輕百分比</p>
-            <p id="repDeltaWPct" class="text-2xl sm:text-3xl font-black text-rose-600 number-display mt-1">2.5%</p>
+            <p id="repDeltaWPct" class="text-2xl sm:text-3xl font-black text-rose-600 number-display mt-1">0.0%</p>
           </div>
           <div class="metric-box-yellow p-4 text-center flex flex-col justify-center">
             <p class="text-sm font-black text-slate-800">累積體脂量</p>
-            <p id="repDeltaF" class="text-2xl sm:text-3xl font-black text-rose-600 number-display mt-1">+0.9 kg</p>
+            <p id="repDeltaF" class="text-2xl sm:text-3xl font-black text-rose-600 number-display mt-1">0.0 kg</p>
           </div>
           <div class="metric-box-green p-4 text-center flex flex-col justify-center">
             <p class="text-sm font-black text-slate-800">累積肌肉量</p>
-            <p id="repDeltaM" class="text-2xl sm:text-3xl font-black text-emerald-600 number-display mt-1">+0.5 kg</p>
+            <p id="repDeltaM" class="text-2xl sm:text-3xl font-black text-emerald-600 number-display mt-1">0.0 kg</p>
           </div>
           <div class="metric-box-cyan col-span-2 p-4 text-center flex flex-col justify-center">
             <p class="text-sm font-black text-slate-800">內臟脂肪變化</p>
-            <p id="repDeltaV" class="text-2xl sm:text-3xl font-black text-rose-600 number-display mt-1">+1.0 級</p>
+            <p id="repDeltaV" class="text-2xl sm:text-3xl font-black text-rose-600 number-display mt-1">0.0 級</p>
           </div>
         </div>
 
@@ -573,11 +578,11 @@
         <div class="grid grid-cols-2 gap-3">
           <div class="metric-box-blue p-3.5 text-center">
             <p class="text-sm font-black text-blue-950 leading-tight">150 分/周累計落實：</p>
-            <p id="repCardio" class="font-black text-blue-700 text-xl number-display mt-1">1 週 達標</p>
+            <p id="repCardio" class="font-black text-blue-700 text-xl number-display mt-1">0 週 達標</p>
           </div>
           <div class="metric-box-green p-3.5 text-center">
             <p class="text-sm font-black text-emerald-950 leading-tight">每週 3 次累計落實：</p>
-            <p id="repResistance" class="font-black text-emerald-700 text-xl number-display mt-1">1 週 達標</p>
+            <p id="repResistance" class="font-black text-emerald-700 text-xl number-display mt-1">0 週 達標</p>
           </div>
         </div>
 
@@ -636,6 +641,7 @@
     </div>
   </div>
 
+  <!-- 第 8、12 週滿意度問卷彈窗 -->
   <div id="surveyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 shadow-2xl space-y-5 border-2 border-emerald-100">
       <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
@@ -741,6 +747,7 @@
     </div>
   </div>
 
+  <!-- 營養門診作者管理後台彈窗 -->
   <div id="authorModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4 border border-orange-100">
       <div class="flex items-center space-x-2.5 pb-2.5 border-b border-slate-100">
@@ -796,18 +803,18 @@
   </div>
 
   <script>
-    // 預設 Apps Script 正式 API 端點
-    const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzK90WesvLTreKS11yL2QnYkwXxIEe1wRc80seGAvFk-d9ZRdNz-Dfe-ujDce1bG4Az/exec";
+    // 正式 Apps Script 最新端點網址 (已更新為用戶最新生成的端點)
+    const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLvkjF0PnL-SDIwhlNjQurqD41hPkTSVeRHdbxRwCphLxsh2nTkCef4OYIAENW2VBE/exec";
 
     // 11 項生活習慣項目定義 (完整保留所有生化機制、突破引導與無痛起步對策)
     const HABIT_DEFINITIONS = [
       { id: "water", title: "1. 足夠水量 (2500~3000ml)", icon: "💧", sub: "帶動基礎代謝率與水分利尿排腫",
         doneWhy: "維持生理原因：每日充足水分可維持微血管充盈，提升交感神經活性與能量代謝率，加速體內老舊廢物排除。",
-        midHow: "改善方式：外出前常備 1000ml 大水壺，三餐飯前半小時各喝 500ml 溫水，即可穩定達標。",
+        midHow: "改善方式：早上起床先喝300~500ml 溫水，外出前常備 1000ml 大水壺，三餐飯前半小時各喝300ml 溫水，下午補充2~3杯 500ml 溫水，即可穩定達標。",
         lowHow: "【無痛起步】未達改善對策：可將無糖麥茶、黑豆水或檸檬片水計入每日總水量，減少對白開水的抗拒感。此外可以設喝水鬧鐘提醒喝水喔!" },
       { id: "protein", title: "2. 足夠蛋白質 (每餐3~4份)", icon: "🥩", sub: "保護肌肉瘦體組織，穩定胰島素",
         doneWhy: "維持生理原因：高生物價蛋白質能誘發食物生熱效應 (TEF)，並提供肌肉合成充足的支鏈胺基酸 (BCAA)。",
-        midHow: "改善方式：早餐補上一顆茶葉蛋或水煮蛋，午晚餐肉類份量維持掌心厚度，讓蛋白質均勻分佈在三餐。",
+        midHow: "改善方式：早餐補上一顆水煮蛋或豆漿，午晚餐肉類份量維持掌心大、1公分厚度，讓蛋白質均勻分佈在三~四餐。",
         lowHow: "【無痛起步】未達改善對策：外食超商隨手取得無糖豆漿或高蛋白飲，隨餐搭配立即補充優質蛋白質。" },
       { id: "vegetables", title: "3. 蔬菜足量 5 份～ (早1午2晚2)", icon: "🥗", sub: "深綠色蔬菜，平穩血糖與延緩吸收",
         doneWhy: "維持生理原因：高量水溶性與非水溶性膳食纖維可阻斷腸道油脂吸收，並平抑飯後胰島素峰值避免脂肪堆積。",
@@ -837,7 +844,7 @@
         doneWhy: "維持生理原因：充足深度睡眠可平衡瘦體素 (Leptin) 與飢餓素，並有效抑制腹部皮質醇堆積內臟脂肪。",
         midHow: "改善方式：睡前半小時遠離手機螢幕藍光，以伸展運動或聽輕音樂營造睡眠儀式感。",
         lowHow: "【無痛起步】未達改善對策：盡量固定於每晚 11 點前就寢，即使偶有熬夜，隔日也盡量於午休補眠 20 分鐘。" },
-      { id: "aerobic150m", title: "10. 有氧運動 150 分/周", icon: "🏃", sub: "中中高強度快走、慢跑或單車，強化心肺代謝",
+      { id: "aerobic150m", title: "10. 有氧運動 150 分/周", icon: "🏃", sub: "中高強度快走、慢跑或單車，強化心肺代謝",
         doneWhy: "維持生理原因：持續有氧刺激能提升骨骼肌微血管密度與粒線體氧化能力，促進深層內臟脂肪快速燃燒。",
         midHow: "改善方式：將 150 分鐘拆解為每週 5 天、每天快走 30 分鐘，通勤時提早一站下車多走路。",
         lowHow: "【無痛起步】未達改善對策：從每日 10 分鐘爬樓梯或原地超慢跑開始，逐步建立有氧心肺耐力。" },
@@ -852,35 +859,10 @@
     let weightChart = null;
     let promptedSurveyWeeks = {};
 
-    // 初始資料庫：示範個案「吳柚子」
+    // 初始資料庫：乾淨空白預設值，純記憶個案自行輸入的資訊
     let database = {
-      patients: {
-        "吳柚子": {
-          profile: {
-            name: "吳柚子",
-            startDate: "2026-09-14",
-            targetWeight: "45.0",
-            demand: "增肌減脂-減重",
-            weightLossMethod: "飲食控制"
-          },
-          currentWeek: 2,
-          weeksData: {
-            0: {
-              metrics: { weight: 52.0, hospitalWeight: 52.0, fatMass: 14.5, fatRate: 27.8, muscle: 35.0, visceralFat: 3.0 },
-              goals: { water: "done", protein: "done", vegetables: "done", proteinSnack: "mid", lowOil: "mid", avoidSugar: "done", earlyDinner: "done", fasting52: "low", sleep7h: "done", aerobic150m: "done", resistance3x: "done" }
-            },
-            1: {
-              metrics: { weight: 52.6, hospitalWeight: 52.5, fatMass: 14.9, fatRate: 28.3, muscle: 35.3, visceralFat: 3.5 },
-              goals: { water: "done", protein: "done", vegetables: "done", proteinSnack: "done", lowOil: "done", avoidSugar: "done", earlyDinner: "done", fasting52: "low", sleep7h: "done", aerobic150m: "done", resistance3x: "done" }
-            },
-            2: {
-              metrics: { weight: 53.3, hospitalWeight: 53.2, fatMass: 15.4, fatRate: 28.8, muscle: 35.5, visceralFat: 4.0 },
-              goals: { water: "done", protein: "done", vegetables: "done", proteinSnack: "done", lowOil: "mid", avoidSugar: "done", earlyDinner: "done", fasting52: "low", sleep7h: "done", aerobic150m: "done", resistance3x: "done" }
-            }
-          }
-        }
-      },
-      currentPatientName: "吳柚子"
+      patients: {},
+      currentPatientName: ""
     };
 
     window.onload = function() {
@@ -888,28 +870,36 @@
     };
 
     function initApp() {
-      // 讀取暫存
-      const saved = localStorage.getItem("chimei_weight_plan_db_v5");
+      // 讀取瀏覽器本機快取紀錄
+      const saved = localStorage.getItem("chimei_weight_plan_db_v6");
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (parsed && parsed.patients) database = parsed;
-        } catch(e) {}
-      }
-
-      if (!database.currentPatientName || !database.patients[database.currentPatientName]) {
-        database.currentPatientName = "吳柚子";
+          if (parsed && typeof parsed === 'object') {
+            database.patients = parsed.patients || {};
+            database.currentPatientName = parsed.currentPatientName || "";
+          }
+        } catch(e) {
+          console.error("載入本機快取失敗", e);
+        }
       }
 
       renderWeekCapsules();
-      loadPatientData(database.currentPatientName);
+      
+      // 若已有歷史輸入過的姓名則自動載入上次填寫的內容；否則維持空白表單
+      if (database.currentPatientName && database.patients[database.currentPatientName]) {
+        loadPatientData(database.currentPatientName);
+      } else {
+        resetToEmptyForm();
+      }
+
       renderGoalsList();
       initChart();
       updateAllCalculations();
     }
 
     function saveToStorage() {
-      localStorage.setItem("chimei_weight_plan_db_v5", JSON.stringify(database));
+      localStorage.setItem("chimei_weight_plan_db_v6", JSON.stringify(database));
     }
 
     function showToast(msg, isSuccess = true) {
@@ -958,41 +948,82 @@
       }
     }
 
+    function resetToEmptyForm() {
+      document.getElementById('patientName').value = "";
+      document.getElementById('fillingDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('targetWeight').value = "";
+      document.getElementById('patientDemand').value = "增肌減脂-減重";
+      document.getElementById('weightLossMethod').value = "飲食控制";
+      document.getElementById('patientStatusBadge').className = "px-3.5 py-1.5 bg-slate-100 text-slate-800 text-sm sm:text-base font-black rounded-full border border-slate-300";
+      document.getElementById('patientStatusBadge').innerText = "⚪ 請輸入姓名以建立或載入個案紀錄";
+      loadCurrentWeekInputs();
+    }
+
     function loadPatientData(name) {
-      if (!database.patients[name]) {
-        database.patients[name] = {
-          profile: { name: name, startDate: new Date().toISOString().split('T')[0], targetWeight: "45.0", demand: "增肌減脂-減重", weightLossMethod: "飲食控制" },
+      const cleanName = (name || "").trim();
+      if (!cleanName) {
+        resetToEmptyForm();
+        return;
+      }
+
+      if (!database.patients[cleanName]) {
+        database.patients[cleanName] = {
+          profile: {
+            name: cleanName,
+            startDate: new Date().toISOString().split('T')[0],
+            targetWeight: "",
+            demand: "增肌減脂-減重",
+            weightLossMethod: "飲食控制"
+          },
           currentWeek: 1,
           weeksData: {}
         };
       }
-      database.currentPatientName = name;
-      const p = database.patients[name];
+      
+      database.currentPatientName = cleanName;
+      const p = database.patients[cleanName];
 
-      document.getElementById('patientName').value = p.profile.name || name;
+      document.getElementById('patientName').value = p.profile.name || cleanName;
       document.getElementById('fillingDate').value = p.profile.startDate || new Date().toISOString().split('T')[0];
       document.getElementById('targetWeight').value = p.profile.targetWeight || "";
       document.getElementById('patientDemand').value = p.profile.demand || "增肌減脂-減重";
       document.getElementById('weightLossMethod').value = p.profile.weightLossMethod || "飲食控制";
 
       const weekCount = Object.keys(p.weeksData || {}).length;
-      document.getElementById('patientStatusBadge').innerText = `🟢 已載入個案：${name} (${weekCount} 週紀錄)`;
+      const badge = document.getElementById('patientStatusBadge');
+      badge.className = "px-3.5 py-1.5 bg-emerald-100 text-emerald-900 text-sm sm:text-base font-black rounded-full border border-emerald-300";
+      badge.innerText = `🟢 已載入個案：${cleanName} (${weekCount} 週紀錄)`;
 
       loadCurrentWeekInputs();
       updateAllCalculations();
+      saveToStorage();
     }
 
     function handleNameInput(name) {
-      const cleanName = name.trim();
-      if (!cleanName) return;
-      if (cleanName !== database.currentPatientName) {
-        loadPatientData(cleanName);
+      const cleanName = (name || "").trim();
+      if (!cleanName) {
+        database.currentPatientName = "";
+        resetToEmptyForm();
+        saveToStorage();
+        updateAllCalculations();
+        return;
       }
+      loadPatientData(cleanName);
     }
 
     function saveProfile() {
-      const p = database.patients[database.currentPatientName];
-      if (!p) return;
+      const name = (document.getElementById('patientName').value || "").trim();
+      if (!name) return;
+
+      if (!database.patients[name]) {
+        database.patients[name] = {
+          profile: { name: name },
+          currentWeek: currentWeek,
+          weeksData: {}
+        };
+      }
+      database.currentPatientName = name;
+      const p = database.patients[name];
       p.profile.startDate = document.getElementById('fillingDate').value;
       p.profile.targetWeight = document.getElementById('targetWeight').value;
       p.profile.demand = document.getElementById('patientDemand').value;
@@ -1002,7 +1033,9 @@
     }
 
     function getPatientWeekData(w) {
-      const p = database.patients[database.currentPatientName];
+      const name = database.currentPatientName;
+      if (!name || !database.patients[name]) return { metrics: {}, goals: {} };
+      const p = database.patients[name];
       if (!p.weeksData) p.weeksData = {};
       if (!p.weeksData[w]) {
         p.weeksData[w] = { metrics: {}, goals: {} };
@@ -1013,15 +1046,23 @@
     function loadCurrentWeekInputs() {
       const wData = getPatientWeekData(currentWeek);
       const m = wData.metrics || {};
-      document.getElementById('mWeight').value = m.weight || "";
-      document.getElementById('mHospitalWeight').value = m.hospitalWeight || "";
-      document.getElementById('mFatMass').value = m.fatMass || "";
-      document.getElementById('mFatRate').value = m.fatRate || "";
-      document.getElementById('mMuscle').value = m.muscle || "";
-      document.getElementById('mVisceral').value = m.visceralFat || "";
+      document.getElementById('mWeight').value = m.weight !== undefined && m.weight !== null ? m.weight : "";
+      document.getElementById('mHospitalWeight').value = m.hospitalWeight !== undefined && m.hospitalWeight !== null ? m.hospitalWeight : "";
+      document.getElementById('mFatMass').value = m.fatMass !== undefined && m.fatMass !== null ? m.fatMass : "";
+      document.getElementById('mFatRate').value = m.fatRate !== undefined && m.fatRate !== null ? m.fatRate : "";
+      document.getElementById('mMuscle').value = m.muscle !== undefined && m.muscle !== null ? m.muscle : "";
+      document.getElementById('mVisceral').value = m.visceralFat !== undefined && m.visceralFat !== null ? m.visceralFat : "";
     }
 
     function updateCurrentMetrics(field, value) {
+      const name = (document.getElementById('patientName').value || "").trim();
+      if (!name) {
+        showToast("請先輸入個案姓名以保存紀錄", false);
+        return;
+      }
+      if (!database.patients[name]) {
+        loadPatientData(name);
+      }
       const wData = getPatientWeekData(currentWeek);
       if (!wData.metrics) wData.metrics = {};
       wData.metrics[field] = value ? parseFloat(value) : null;
@@ -1078,6 +1119,13 @@
     }
 
     function setHabitStatus(habitId, status) {
+      const name = (document.getElementById('patientName').value || "").trim();
+      if (!name) {
+        showToast("請先輸入個案姓名以保存習慣狀態", false);
+        return;
+      }
+      if (!database.patients[name]) loadPatientData(name);
+
       const wData = getPatientWeekData(currentWeek);
       if (!wData.goals) wData.goals = {};
       wData.goals[habitId] = status;
@@ -1088,8 +1136,7 @@
 
     function updateAllCalculations() {
       const p = database.patients[database.currentPatientName];
-      if (!p) return;
-      const weeksData = p.weeksData || {};
+      const weeksData = p ? (p.weeksData || {}) : {};
 
       // 1. 計算當週總分
       const curW = weeksData[currentWeek] || {};
@@ -1176,7 +1223,7 @@
       renderHabitAchievements(weeksData, recordedWeeksCount);
 
       // 8. 重新繪製 Chart.js
-      updateChart(weeksData, p.profile.targetWeight);
+      updateChart(weeksData, p?.profile?.targetWeight);
     }
 
     function renderDeltaBox(elementId, val, unit, isMuscle = false) {
@@ -1249,12 +1296,12 @@
         tr.className = w === currentWeek ? 'bg-orange-50 font-black' : 'hover:bg-slate-50';
         tr.innerHTML = `
           <td class="p-3.5 font-black whitespace-nowrap">${w === 0 ? '基準期(W0)' : `第 ${w} 週`}</td>
-          <td class="p-3.5 text-center number-display">${m.weight ? m.weight.toFixed(1) : '-'}</td>
-          <td class="p-3.5 text-center number-display">${m.hospitalWeight ? m.hospitalWeight.toFixed(1) : '-'}</td>
-          <td class="p-3.5 text-center number-display">${m.fatMass ? m.fatMass.toFixed(1) : '-'}</td>
-          <td class="p-3.5 text-center number-display">${m.fatRate ? m.fatRate.toFixed(1) + '%' : '-'}</td>
-          <td class="p-3.5 text-center number-display">${m.muscle ? m.muscle.toFixed(1) : '-'}</td>
-          <td class="p-3.5 text-center number-display">${m.visceralFat ? m.visceralFat.toFixed(1) : '-'}</td>
+          <td class="p-3.5 text-center number-display">${m.weight !== undefined && m.weight !== null ? m.weight.toFixed(1) : '-'}</td>
+          <td class="p-3.5 text-center number-display">${m.hospitalWeight !== undefined && m.hospitalWeight !== null ? m.hospitalWeight.toFixed(1) : '-'}</td>
+          <td class="p-3.5 text-center number-display">${m.fatMass !== undefined && m.fatMass !== null ? m.fatMass.toFixed(1) : '-'}</td>
+          <td class="p-3.5 text-center number-display">${m.fatRate !== undefined && m.fatRate !== null ? m.fatRate.toFixed(1) + '%' : '-'}</td>
+          <td class="p-3.5 text-center number-display">${m.muscle !== undefined && m.muscle !== null ? m.muscle.toFixed(1) : '-'}</td>
+          <td class="p-3.5 text-center number-display">${m.visceralFat !== undefined && m.visceralFat !== null ? m.visceralFat.toFixed(1) : '-'}</td>
           <td class="p-3.5 text-center font-black ${score >= 70 ? 'text-orange-600' : 'text-slate-600'}">${w === 0 ? '基準' : score + ' 分'}</td>
           <td class="p-3.5 text-center font-black whitespace-nowrap">${aeroStr} / ${resStr}</td>
         `;
@@ -1325,7 +1372,7 @@
       const tVal = targetW ? parseFloat(targetW) : null;
 
       for (let w = 0; w <= 12; w++) {
-        const m = (weeksData[w] && weeksData[w].metrics) ? weeksData[w].metrics : {};
+        const m = (weeksData && weeksData[w] && weeksData[w].metrics) ? weeksData[w].metrics : {};
         wArr.push(m.weight !== undefined && m.weight !== null ? m.weight : null);
         fArr.push(m.fatMass !== undefined && m.fatMass !== null ? m.fatMass : null);
         mArr.push(m.muscle !== undefined && m.muscle !== null ? m.muscle : null);
@@ -1341,13 +1388,13 @@
 
     function openReportModal() {
       const p = database.patients[database.currentPatientName];
-      if (!p) return;
-      const prof = p.profile || {};
-      const weeksData = p.weeksData || {};
+      const prof = p ? p.profile : {};
+      const weeksData = p ? (p.weeksData || {}) : {};
+      const displayName = prof?.name || document.getElementById('patientName').value.trim() || '個案';
 
-      document.getElementById('repCardTitle').innerText = `${prof.name || '個案'} 的 3 個月減重成效與生活型態總結`;
-      document.getElementById('repSubLine1').innerText = `填寫日期：${prof.startDate || '-'} ｜ 目標需求：${prof.demand || '增肌減脂-減重'}`;
-      document.getElementById('repSubLine2').innerText = `控制方式：${prof.weightLossMethod || '飲食控制'} ｜ 目標體重：${prof.targetWeight ? prof.targetWeight + ' kg' : '-'} ｜ 當前週次：第 ${currentWeek} 周`;
+      document.getElementById('repCardTitle').innerText = `${displayName} 的 3 個月減重成效與生活型態總結`;
+      document.getElementById('repSubLine1').innerText = `填寫日期：${prof?.startDate || document.getElementById('fillingDate').value || '-'} ｜ 目標需求：${prof?.demand || document.getElementById('patientDemand').value || '增肌減脂-減重'}`;
+      document.getElementById('repSubLine2').innerText = `控制方式：${prof?.weightLossMethod || document.getElementById('weightLossMethod').value || '飲食控制'} ｜ 目標體重：${prof?.targetWeight || document.getElementById('targetWeight').value || '-'} kg ｜ 當前週次：第 ${currentWeek} 周`;
 
       let bW = null, bF = null, bM = null, bV = null;
       if (weeksData[0] && weeksData[0].metrics) {
@@ -1443,7 +1490,7 @@
     async function submitSurveyData() {
       const btn = document.getElementById('submitSurveyBtn');
       const p = database.patients[database.currentPatientName];
-      if (!p) return;
+      const curName = p?.profile?.name || document.getElementById('patientName').value.trim() || "未填寫";
 
       const getRadioVal = (name) => {
         const checked = document.querySelector(`input[name="${name}"]:checked`);
@@ -1453,7 +1500,7 @@
       const payload = {
         action: "saveSurvey",
         survey: {
-          patientName: p.profile.name || "未填寫",
+          patientName: curName,
           stage: `第 ${currentWeek} 周回饋`,
           overall: getRadioVal('qOverall'),
           practical: getRadioVal('qPractical'),
@@ -1486,9 +1533,16 @@
     }
 
     async function submitToGoogleSheet() {
+      const name = (document.getElementById('patientName').value || "").trim();
+      if (!name) {
+        showToast("請先輸入個案姓名再送出紀錄！", false);
+        document.getElementById('patientName').focus();
+        return;
+      }
+
+      saveProfile();
+      const p = database.patients[name];
       const btn = document.getElementById('submitBtn');
-      const p = database.patients[database.currentPatientName];
-      if (!p) return;
 
       const payload = {
         action: "saveWeekRecord",
@@ -1524,18 +1578,22 @@
     }
 
     function exportCurrentPatientCSV() {
-      const p = database.patients[database.currentPatientName];
-      if (!p) return;
+      const name = (document.getElementById('patientName').value || "").trim();
+      const p = database.patients[name];
+      if (!p) {
+        showToast("尚未有任何紀錄可匯出！", false);
+        return;
+      }
       let csv = "\uFEFF週次,空腹體重,醫院體重,體脂量,體脂率,肌肉量,內臟脂肪\n";
       for (let w = 0; w <= 12; w++) {
-        const m = (p.weeksData[w] && p.weeksData[w].metrics) ? p.weeksData[w].metrics : {};
+        const m = (p.weeksData && p.weeksData[w] && p.weeksData[w].metrics) ? p.weeksData[w].metrics : {};
         csv += `${w},${m.weight||''},${m.hospitalWeight||''},${m.fatMass||''},${m.fatRate||''},${m.muscle||''},${m.visceralFat||''}\n`;
       }
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${p.profile.name || '個案'}_體重周計畫紀錄.csv`;
+      a.download = `${name || '個案'}_體重周計畫紀錄.csv`;
       a.click();
       showToast("已成功下載個人紀錄 CSV 檔案！");
     }
@@ -1560,11 +1618,11 @@
       let mCount = 0, mTracked = 0, mW = 0, mF = 0;
 
       Object.values(database.patients).forEach(p => {
-        const isMed = (p.profile.weightLossMethod && p.profile.weightLossMethod.includes("藥物"));
+        const isMed = (p.profile?.weightLossMethod && p.profile.weightLossMethod.includes("藥物"));
         if (isMed) mCount++; else dCount++;
 
-        const w0 = p.weeksData[0]?.metrics?.weight;
-        const wLatest = p.weeksData[p.currentWeek]?.metrics?.weight;
+        const w0 = p.weeksData?.[0]?.metrics?.weight;
+        const wLatest = p.weeksData?.[p.currentWeek]?.metrics?.weight;
         if (w0 && wLatest) {
           const delta = wLatest - w0;
           if (isMed) { mTracked++; mW += delta; }
@@ -1573,16 +1631,16 @@
       });
 
       document.getElementById('statDietCount').innerText = `收案：${dCount} 人`;
-      document.getElementById('statDietAvgW').innerText = `平均減重：${dTracked > 0 ? (dW / dTracked).toFixed(1) : 0.0} kg`;
+      document.getElementById('statDietAvgW').innerText = `平均減重：${dTracked > 0 ? (dW / dTracked).toFixed(1) : '0.0'} kg`;
       document.getElementById('statMedCount').innerText = `收案：${mCount} 人`;
-      document.getElementById('statMedAvgW').innerText = `平均減重：${mTracked > 0 ? (mW / mTracked).toFixed(1) : 0.0} kg`;
+      document.getElementById('statMedAvgW').innerText = `平均減重：${mTracked > 0 ? (mW / mTracked).toFixed(1) : '0.0'} kg`;
     }
 
     function exportAllPatientsMasterCSV() {
       let csv = "\uFEFF個案姓名,填寫日期,個人目標需求,控制方式,目標體重,最新週次\n";
       Object.values(database.patients).forEach(p => {
         const prof = p.profile || {};
-        csv += `${prof.name||''},${prof.startDate||''},${prof.demand||''},${prof.weightLossMethod||''},${prof.targetWeight||''},第 ${p.currentWeek} 周\n`;
+        csv += `${prof.name||''},${prof.startDate||''},${prof.demand||''},${prof.weightLossMethod||''},${prof.targetWeight||''},第 ${p.currentWeek || 1} 周\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
